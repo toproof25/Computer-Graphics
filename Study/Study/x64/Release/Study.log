@@ -1,0 +1,11 @@
+﻿  test.cpp
+C:\Users\USER\OneDrive\onedrive\학교\2024-3학년-2학기\컴퓨터 그래픽스\code\Study\Study\test.cpp(16,7): warning C4305: '초기화 중': 'double'에서 'GLfloat'(으)로 잘립니다.
+C:\Users\USER\OneDrive\onedrive\학교\2024-3학년-2학기\컴퓨터 그래픽스\code\Study\Study\test.cpp(16,12): warning C4305: '초기화 중': 'double'에서 'GLfloat'(으)로 잘립니다.
+C:\Users\USER\OneDrive\onedrive\학교\2024-3학년-2학기\컴퓨터 그래픽스\code\Study\Study\test.cpp(16,17): warning C4305: '초기화 중': 'double'에서 'GLfloat'(으)로 잘립니다.
+  코드를 생성하고 있습니다.
+  Previous IPDB not found, fall back to full compilation.
+  All 4 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  코드를 생성했습니다.
+  Study.vcxproj -> C:\Users\USER\OneDrive\onedrive\학교\2024-3학년-2학기\컴퓨터 그래픽스\code\Study\x64\Release\Study.exe
+  'pwsh.exe' is not recognized as an internal or external command,
+  operable program or batch file.
