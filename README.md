@@ -14,6 +14,10 @@
 - 테이블을 그리는 코드는 디스플레이 리스트를 이용하여 그렸습니다.
 
 
+### 디스플레이 리스트, 정점 배열을 이용하여 테이블을 그림
+![image](https://github.com/user-attachments/assets/8ffc34a6-0755-4330-ac71-5f4d161a33b4)
+
+
 
 ## 2. 탁자 위에 기하학적 물체를 모델링
 
@@ -27,6 +31,9 @@
 
 - 키보드 e를 입력하면 ViewMode변수를 따로 두어 glLookAt에 z값을 1, -1로 변경합니다. 물체의 반대편을 보기 위해서 추가해보았습니다.
 
+### 키보드 w입력 시 와이어프레임 모드, e 입력 시 물체 반대편 보기 
+![image](https://github.com/user-attachments/assets/dd8b4c95-4a14-43c2-beb3-4a3747f9c6d7)
+
 
 
 ## 4. 마우스를 이용하여 시점 변경
@@ -37,10 +44,10 @@
 
 - 좌클릭을 땔 경우 마지막 좌표 값을 저장하여 변경했던 각도를 유지하도록 작성하였습니다.
 
-마우스 좌표값 저장   
+### 마우스 좌표값 저장   
 ![image](https://github.com/user-attachments/assets/5bfd446d-a27b-465a-853f-2357609ce924)
 
-gluLookAt에 x, y값 설정   
+### gluLookAt에 x, y값 설정   
 ![image](https://github.com/user-attachments/assets/5e328627-85c5-462f-968f-43edced9b76c)
 
 
