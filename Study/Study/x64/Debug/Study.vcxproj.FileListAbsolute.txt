@@ -1,1 +1,2 @@
 C:\Users\USER\OneDrive\onedrive\학교\2024-3학년-2학기\컴퓨터 그래픽스\code\Study\Study\x64\Debug\Study.vcxproj.Up2Date
+C:\GitHubDesktop\Computer-Graphics\Study\Study\x64\Debug\Study.vcxproj.Up2Date

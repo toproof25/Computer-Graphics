@@ -1,9 +1,9 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\USER\\OneDrive\\onedrive\\\uD559\uAD50\\2024-3\uD559\uB144-2\uD559\uAE30\\\uCEF4\uD4E8\uD130 \uADF8\uB798\uD53D\uC2A4\\code\\Study\\",
+  "WorkspaceRootPath": "C:\\GitHubDesktop\\Computer-Graphics\\Study\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{EA7BB0A1-474D-48D5-A855-D66271722429}|Study\\Study.vcxproj|C:\\Users\\USER\\OneDrive\\onedrive\\\uD559\uAD50\\2024-3\uD559\uB144-2\uD559\uAE30\\\uCEF4\uD4E8\uD130 \uADF8\uB798\uD53D\uC2A4\\code\\Study\\Study\\test.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "AbsoluteMoniker": "D:0:0:{EA7BB0A1-474D-48D5-A855-D66271722429}|Study\\Study.vcxproj|C:\\GitHubDesktop\\Computer-Graphics\\Study\\Study\\test.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{EA7BB0A1-474D-48D5-A855-D66271722429}|Study\\Study.vcxproj|solutionrelative:Study\\test.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     }
   ],
@@ -20,11 +20,11 @@
               "$type": "Document",
               "DocumentIndex": 0,
               "Title": "test.cpp",
-              "DocumentMoniker": "C:\\Users\\USER\\OneDrive\\onedrive\\\uD559\uAD50\\2024-3\uD559\uB144-2\uD559\uAE30\\\uCEF4\uD4E8\uD130 \uADF8\uB798\uD53D\uC2A4\\code\\Study\\Study\\test.cpp",
+              "DocumentMoniker": "C:\\GitHubDesktop\\Computer-Graphics\\Study\\Study\\test.cpp",
               "RelativeDocumentMoniker": "Study\\test.cpp",
-              "ToolTip": "C:\\Users\\USER\\OneDrive\\onedrive\\\uD559\uAD50\\2024-3\uD559\uB144-2\uD559\uAE30\\\uCEF4\uD4E8\uD130 \uADF8\uB798\uD53D\uC2A4\\code\\Study\\Study\\test.cpp",
+              "ToolTip": "C:\\GitHubDesktop\\Computer-Graphics\\Study\\Study\\test.cpp",
               "RelativeToolTip": "Study\\test.cpp",
-              "ViewState": "AgIAAPkAAAAAAAAAAAAAAKAAAAAkAAAAAAAAAA==",
+              "ViewState": "AgIAAK0AAAAAAAAAAAAAwLsAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2024-09-30T02:19:54.234Z",
               "EditorCaption": ""

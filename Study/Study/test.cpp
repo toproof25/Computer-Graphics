@@ -26,14 +26,17 @@ GLfloat TableVertices[8][3] = {
 	{0.75,-0.4,-0.45}
 };
 // 테이블 각 정점의 색 - 표현이 안됨
-GLfloat TableColors[] = {
-	0.5, 0.5, 0.5,
-	0.5, 0.5, 0.5,
-	0.5, 0.5, 0.5,
-	0.5, 0.5, 0.5,
-	0.5, 0.5, 0.5,
-	0.5, 0.5, 0.5
+GLfloat TableColors[8][3] = {
+	{0.5, 0.5, 0.5},
+	{0.5, 0.5, 0.5},
+	{0.5, 0.5, 0.5},
+	{0.5, 0.5, 0.5},
+	{0.5, 0.5, 0.5},
+	{0.5, 0.5, 0.5},
+	{0.5, 0.5, 0.5},
+	{0.5, 0.5, 0.5}
 };
+
 // 테이블 면
 GLubyte TableVertexList[24] = {
 	0,3,2,1,
@@ -57,14 +60,17 @@ GLfloat TableLegVertices[8][3] = {
 	{0.05,  -0.9,  -0.05}
 };
 // 테이블 다리 색 - 마찬가지로 표현이 안됨
-GLfloat TableLegColors[] = {
-	0.4, 0.4, 0.4,
-	0.4, 0.4, 0.4,
-	0.4, 0.4, 0.4,
-	0.4, 0.4, 0.4,
-	0.4, 0.4, 0.4,
-	0.4, 0.4, 0.4
+GLfloat TableLegColors[8][3] = {
+	{0.4, 0.4, 0.4},
+	{0.4, 0.4, 0.4},
+	{0.4, 0.4, 0.4},
+	{0.4, 0.4, 0.4},
+	{0.4, 0.4, 0.4},
+	{0.4, 0.4, 0.4},
+	{0.4, 0.4, 0.4},
+	{0.4, 0.4, 0.4}
 };
+
 // 테이블 다리 면
 GLubyte TableLegVertexList[24] = {
 	0,3,2,1,
@@ -136,6 +142,7 @@ void MyKeyboard(unsigned char key, int x, int y) {
 		glutPostRedisplay();
 		break;
 
+	// 반대쪽 시야
 	case 'e':
 		if (ViewMode > 0) {
 			ViewMode = -1;
@@ -157,23 +164,20 @@ void MyKeyboard(unsigned char key, int x, int y) {
 // 마우스 이동 이벤트 좌표를 변수에 저장
 void MyMouseMove(GLint X, GLint Y) {
 	// 추가 부분 - 마우스 움직임 X, Y를 전역변수 View X, Y에 할당하라
+
 	ViewX = vX + X - (window_size / 2);
 	ViewY = vY + Y - (window_size / 2);
 
 	glutPostRedisplay();
 }
 
-// 마우스 좌클릭 or 우클릭 
+// 마우스 좌클릭
 void MyMouseClick(GLint Button, GLint State, GLint X, GLint Y) {
-	if (Button == GLUT_LEFT_BUTTON && State == GLUT_DOWN) {
-		
-	}
-	else if (Button == GLUT_LEFT_BUTTON && State == GLUT_UP) {
+	if (Button == GLUT_LEFT_BUTTON && State == GLUT_UP) { // 좌클릭 버튼 땔 경우 마지막 좌표값을 저장
 		vX = ViewX;
 		vY = ViewY;
 	}
 }
-
 
 
 // 디스플레이 리스트 - 테이블
@@ -207,7 +211,7 @@ void CreateTable() {
 
 	for (GLint i = 0; i < 4; i++) {
 		glPushMatrix(); // 현재 행렬 저장 - 값이 바뀌어서 원본을 저장하고, 바꾼 다음 그리고, 이후 다시 원본으로 복구
-		glTranslatef(offsetX[i], 0.0f, offsetZ[i]); // 각 다리를 테이블 모서리쪽으로 이동 (좌표값이 바뀜 - 저장을 해야한다)
+		glTranslatef(offsetX[i], -0.1f, offsetZ[i]); // 각 다리를 테이블 모서리쪽으로 이동 (좌표값이 바뀜 - 저장을 해야한다)
 
 		for (GLint j = 0; j < 6; j++)
 			glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_BYTE, &TableLegVertexList[4 * j]);
@@ -237,15 +241,8 @@ void MyDisplay() {
 	// 좌표 프린트
 	printf("x : %.3f \t y : %.3f \t mode : %d\n", x, y, ViewMode);
 
+	glutSolidTeapot(object_size); // 찻주전자
 
-	// 찻주전자의 재질 설정 (예시: 빨간색 재질)
-	GLfloat teapot_diffuse[] = { 1.0f, 0.0f, 0.0f, 1.0f }; // 빨강
-	glMaterialfv(GL_FRONT, GL_DIFFUSE, teapot_diffuse);
-	glutSolidTeapot(object_size); // 찻주전자 가운데
-
-	// 테이블의 재질 설정 (회색 재질)
-	GLfloat table_diffuse[] = { 0.0f, 0.0f, 0.0f, 1.0f }; // 회색
-	glMaterialfv(GL_FRONT, GL_DIFFUSE, table_diffuse);
 	glCallList(tableList); // 테이블
 
     glFlush();
@@ -267,6 +264,9 @@ int main(int argc, char** argv) {
 	glutCreateWindow("HW OpenGL");
 	glClearColor(0.4, 0.4, 0.4, 0.0);
 	InitLight();
+
+	//glEnable(GL_COLOR_MATERIAL);
+	//glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 
 	glutDisplayFunc(MyDisplay);
 	glutKeyboardFunc(MyKeyboard); // 키 입력에 따라 렌더링 방식 변경
