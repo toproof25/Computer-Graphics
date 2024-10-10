@@ -6,8 +6,8 @@
 
 int FlatShaded = 0, Wireframed = 0; // 모드 토글
 int ViewX = 0, ViewY = 0; // 마우스 좌표
-int ViewMode = -1;
-int vX = 0, vY = 0;
+int ViewMode = -1; // 물체 반대편 보기
+int vX = 0, vY = 0; // 마지막 좌표 저장 - 각도 유지
 
 int window_size = 800; // 윈도우 사이즈
 float object_size = 0.35; // 찻주전자 사이즈
@@ -165,6 +165,7 @@ void MyKeyboard(unsigned char key, int x, int y) {
 void MyMouseMove(GLint X, GLint Y) {
 	// 추가 부분 - 마우스 움직임 X, Y를 전역변수 View X, Y에 할당하라
 
+	// 중앙이 0이 되도록 설정하며, 기존 각도를 유지하기 위해 vX, vY를 더해줌
 	ViewX = vX + X - (window_size / 2);
 	ViewY = vY + Y - (window_size / 2);
 
@@ -200,7 +201,9 @@ void CreateTable() {
 		glDrawElements(GL_POLYGON, 4, GL_UNSIGNED_BYTE, &TableVertexList[4 * i]);
 	}
 
-	/* 다리 그리기 - 하나의 다리를 기준으로 각 테이블 모서리 위치쪽으로 4개를 그리게 함 */
+	/* 다리 그리기 - 하나의 다리를 기준으로 각 테이블 모서리 위치쪽으로 4개를 그리게 함 
+		왼쪽 위, 오른쪽 위, 왼쪽 아래, 오른쪽 아래로 좌표를 이동하면서 정점 배열을 그림
+	*/
 	float x = 0.65;
 	float y = 0.35;
 	GLfloat offsetX[4] = { -x, x, -x, x }; // X
@@ -271,7 +274,7 @@ int main(int argc, char** argv) {
 	glutDisplayFunc(MyDisplay);
 	glutKeyboardFunc(MyKeyboard); // 키 입력에 따라 렌더링 방식 변경
 	glutMotionFunc(MyMouseMove); // 클릭 후 이동하면 오브젝트 시점 변경
-	glutMouseFunc(MyMouseClick); // 마우스 클릭 좌클릭 사이즈 업, 우클릭 사이즈 다운
+	glutMouseFunc(MyMouseClick); // 마우스 클릭 좌클릭
 	glutReshapeFunc(MyReshape);
 
     CreateTable();
