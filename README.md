@@ -17,13 +17,15 @@
 ### 디스플레이 리스트, 정점 배열을 이용하여 테이블을 그림
 ![image](https://github.com/user-attachments/assets/8ffc34a6-0755-4330-ac71-5f4d161a33b4)
 
-
+<br/>
+<br/>
 
 ## 2. 탁자 위에 기하학적 물체를 모델링
 
 - 찻주전자를 불러와서 테이블 위쪽으로 위치하였습니다
 
-
+<br/>
+<br/>
 
 ## 3. 키보드 입력 시 
 
@@ -34,6 +36,8 @@
 ### 키보드 w입력 시 와이어프레임 모드, e 입력 시 물체 반대편 보기 
 ![image](https://github.com/user-attachments/assets/dd8b4c95-4a14-43c2-beb3-4a3747f9c6d7)
 
+<br/>
+<br/>
 
 
 ## 4. 마우스를 이용하여 시점 변경
