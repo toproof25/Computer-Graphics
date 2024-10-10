@@ -37,10 +37,10 @@
 
 - 좌클릭을 땔 경우 마지막 좌표 값을 저장하여 변경했던 각도를 유지하도록 작성하였습니다.
 
-마우스 좌표값 저장
+마우스 좌표값 저장   
 ![image](https://github.com/user-attachments/assets/5bfd446d-a27b-465a-853f-2357609ce924)
 
-gluLookAt에 x, y값 설정
+gluLookAt에 x, y값 설정   
 ![image](https://github.com/user-attachments/assets/5e328627-85c5-462f-968f-43edced9b76c)
 
 
