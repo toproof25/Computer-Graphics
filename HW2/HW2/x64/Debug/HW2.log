@@ -1,13 +1,13 @@
 ﻿  hw2.cpp
-C:\Users\USER\source\repos\HW2\HW2\hw2.cpp(23,25): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
-C:\Users\USER\source\repos\HW2\HW2\hw2.cpp(23,20): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
-C:\Users\USER\source\repos\HW2\HW2\hw2.cpp(28,18): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
-C:\Users\USER\source\repos\HW2\HW2\hw2.cpp(30,25): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
-C:\Users\USER\source\repos\HW2\HW2\hw2.cpp(30,20): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
-C:\Users\USER\source\repos\HW2\HW2\hw2.cpp(35,18): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
-C:\Users\USER\source\repos\HW2\HW2\hw2.cpp(36,25): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
-C:\Users\USER\source\repos\HW2\HW2\hw2.cpp(36,20): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
-C:\Users\USER\source\repos\HW2\HW2\hw2.cpp(36,15): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
-  HW2.vcxproj -> C:\Users\USER\source\repos\HW2\x64\Debug\HW2.exe
+C:\GitHubDesktop\Computer-Graphics\HW2\HW2\hw2.cpp(56,25): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
+C:\GitHubDesktop\Computer-Graphics\HW2\HW2\hw2.cpp(56,20): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
+C:\GitHubDesktop\Computer-Graphics\HW2\HW2\hw2.cpp(61,18): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
+C:\GitHubDesktop\Computer-Graphics\HW2\HW2\hw2.cpp(63,25): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
+C:\GitHubDesktop\Computer-Graphics\HW2\HW2\hw2.cpp(63,20): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
+C:\GitHubDesktop\Computer-Graphics\HW2\HW2\hw2.cpp(68,18): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
+C:\GitHubDesktop\Computer-Graphics\HW2\HW2\hw2.cpp(69,25): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
+C:\GitHubDesktop\Computer-Graphics\HW2\HW2\hw2.cpp(69,20): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
+C:\GitHubDesktop\Computer-Graphics\HW2\HW2\hw2.cpp(69,15): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
+  HW2.vcxproj -> C:\GitHubDesktop\Computer-Graphics\HW2\x64\Debug\HW2.exe
   'pwsh.exe' is not recognized as an internal or external command,
   operable program or batch file.

@@ -1,1 +1,2 @@
 C:\Users\USER\source\repos\HW2\HW2\x64\Debug\HW2.vcxproj.Up2Date
+C:\GitHubDesktop\Computer-Graphics\HW2\HW2\x64\Debug\HW2.vcxproj.Up2Date
