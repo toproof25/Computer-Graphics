@@ -1,15 +1,23 @@
 # 컴퓨터 그래픽스 보너스 프로젝트 과제
 
 
-## 1. gluLookAt 함수 시야 변경
-
+## 1. gluLookAt 함수 시야를 제어하기 위해 변수로 설정
 ```cpp
-    // 태양계 위에서 보기 추가
-    gluLookAt(
-        0, 0, 0.1,
-        0.0, -100.0, 0.0,
-        0.0, 1.0, .0
-    );
+// gluLookAt 변수들
+GLdouble eyex = 0, eyey = 0, eyez = 0;
+GLdouble centerx = 0, centery = 0, centerz = -1;
+GLdouble upx = 0, upy = 1, upz = 0;
+
+// 목표 gluLookAt 변수들
+GLdouble target_eyex = 0, target_eyey = 0, target_eyez = 0;
+GLdouble target_centerx = 0, target_centery = 0, target_centerz = -1;
+GLdouble target_upx = 0, target_upy = 1, target_upz = 0;
+
+gluLookAt(
+    eyex, eyey, eyez,
+    centerx, centery, centerz,
+    upx, upy, upz
+);
 ```
 ## 2. 태양 주변에 상, 하, 좌, 우, 앞, 뒤 구분을 위한 박스 생성
 ```cpp
