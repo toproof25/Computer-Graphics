@@ -1,13 +1,19 @@
 ﻿  hw2.cpp
-C:\GitHubDesktop\Computer-Graphics\HW2\HW2\hw2.cpp(56,25): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
-C:\GitHubDesktop\Computer-Graphics\HW2\HW2\hw2.cpp(56,20): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
-C:\GitHubDesktop\Computer-Graphics\HW2\HW2\hw2.cpp(61,18): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
-C:\GitHubDesktop\Computer-Graphics\HW2\HW2\hw2.cpp(63,25): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
-C:\GitHubDesktop\Computer-Graphics\HW2\HW2\hw2.cpp(63,20): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
-C:\GitHubDesktop\Computer-Graphics\HW2\HW2\hw2.cpp(68,18): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
-C:\GitHubDesktop\Computer-Graphics\HW2\HW2\hw2.cpp(69,25): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
-C:\GitHubDesktop\Computer-Graphics\HW2\HW2\hw2.cpp(69,20): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
-C:\GitHubDesktop\Computer-Graphics\HW2\HW2\hw2.cpp(69,15): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
+C:\GitHubDesktop\Computer-Graphics\HW2\HW2\hw2.cpp(36,23): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
+C:\GitHubDesktop\Computer-Graphics\HW2\HW2\hw2.cpp(43,23): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
+C:\GitHubDesktop\Computer-Graphics\HW2\HW2\hw2.cpp(50,18): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
+C:\GitHubDesktop\Computer-Graphics\HW2\HW2\hw2.cpp(57,18): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
+C:\GitHubDesktop\Computer-Graphics\HW2\HW2\hw2.cpp(64,28): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
+C:\GitHubDesktop\Computer-Graphics\HW2\HW2\hw2.cpp(71,28): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
+C:\GitHubDesktop\Computer-Graphics\HW2\HW2\hw2.cpp(92,25): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
+C:\GitHubDesktop\Computer-Graphics\HW2\HW2\hw2.cpp(92,20): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
+C:\GitHubDesktop\Computer-Graphics\HW2\HW2\hw2.cpp(97,18): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
+C:\GitHubDesktop\Computer-Graphics\HW2\HW2\hw2.cpp(99,25): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
+C:\GitHubDesktop\Computer-Graphics\HW2\HW2\hw2.cpp(99,20): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
+C:\GitHubDesktop\Computer-Graphics\HW2\HW2\hw2.cpp(104,18): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
+C:\GitHubDesktop\Computer-Graphics\HW2\HW2\hw2.cpp(105,25): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
+C:\GitHubDesktop\Computer-Graphics\HW2\HW2\hw2.cpp(105,20): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
+C:\GitHubDesktop\Computer-Graphics\HW2\HW2\hw2.cpp(105,15): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
   HW2.vcxproj -> C:\GitHubDesktop\Computer-Graphics\HW2\x64\Debug\HW2.exe
   'pwsh.exe' is not recognized as an internal or external command,
   operable program or batch file.
