@@ -1,0 +1,10 @@
+﻿  ball.cpp
+C:\GitHubDesktop\Computer-Graphics\HW3\project4\gravityBall\gravityBall\ball.cpp(52,33): warning C4305: '초기화 중': 'double'에서 'GLfloat'(으)로 잘립니다.
+C:\GitHubDesktop\Computer-Graphics\HW3\project4\gravityBall\gravityBall\ball.cpp(52,38): warning C4305: '초기화 중': 'double'에서 'GLfloat'(으)로 잘립니다.
+C:\GitHubDesktop\Computer-Graphics\HW3\project4\gravityBall\gravityBall\ball.cpp(52,43): warning C4305: '초기화 중': 'double'에서 'GLfloat'(으)로 잘립니다.
+C:\GitHubDesktop\Computer-Graphics\HW3\project4\gravityBall\gravityBall\ball.cpp(53,33): warning C4305: '초기화 중': 'double'에서 'GLfloat'(으)로 잘립니다.
+C:\GitHubDesktop\Computer-Graphics\HW3\project4\gravityBall\gravityBall\ball.cpp(53,38): warning C4305: '초기화 중': 'double'에서 'GLfloat'(으)로 잘립니다.
+C:\GitHubDesktop\Computer-Graphics\HW3\project4\gravityBall\gravityBall\ball.cpp(53,43): warning C4305: '초기화 중': 'double'에서 'GLfloat'(으)로 잘립니다.
+  gravityBall.vcxproj -> C:\GitHubDesktop\Computer-Graphics\HW3\project4\gravityBall\x64\Debug\gravityBall.exe
+  'pwsh.exe' is not recognized as an internal or external command,
+  operable program or batch file.
