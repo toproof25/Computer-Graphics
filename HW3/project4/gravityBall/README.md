@@ -188,4 +188,38 @@ void MyDisplay() {
 }
 ```
 
+## 떨어지는 공 애니메이션 구현
+```cpp
+// 공 업데이트 함수
+void FallingBall() {
+    preVelocityY = velocityY; // 이전 속도 저장
+    velocityY += gravity; // 현재 속도 계산
+    ballY += velocityY; // 위치 계산
 
+    // 바닥에 닿을 때
+    if (ballY - ballRadius <= floorHeight) {
+        ballY = floorHeight + ballRadius;
+        velocityY = -velocityY * elasticity; // 공이 다시 튀어오를 때 탄성만큼 속도 감소
+
+        // 공이 땅에 닿으면서 계속해서 튀어오를 수 있는 힘이 있을 때
+        if (isFloor == false && fabs(velocityY - preVelocityY) >= 0.005f) {
+            isFloor = true;
+            scaleX = 1.3f; // X 방향으로 납작해짐
+            scaleY = 0.5f; // Y 방향으로 납작해짐
+        }
+    }
+
+    // 공이 납작해진 후 다시 원래대로 돌아오기
+    if (isFloor) {
+        scaleX += (1.0f - scaleX) * 0.25f; // 원래 크기로 복원
+        scaleY += (1.0f - scaleY) * 0.25f;
+
+        // 공 크기가 복구되면 멈추기
+        if (fabs(scaleX - 1.0f) <= 0.01f && fabs(scaleY - 1.0f) <= 0.01f) {
+            isFloor = false;
+        }
+    }
+
+    glutPostRedisplay();
+}
+```
