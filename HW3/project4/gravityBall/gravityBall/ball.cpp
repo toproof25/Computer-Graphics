@@ -15,6 +15,7 @@ GLdouble eyex = 1, eyey = 1, eyez = 3;
 GLdouble centerx = 0, centery = 0, centerz = 0;
 GLdouble upx = 0, upy = 1, upz = 0;
 
+// 재질 설정 변수 (조명으로 인해 재질을 바꿔줘야 물체색이 변함)
 GLfloat floor_color[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 GLfloat ball_color[] = { 1.0f, 0.0f, 0.0f, 1.0f };
 GLfloat shadow_color[] = { 0.0f, 0.0f, 0.0f, 1.0f };
@@ -59,6 +60,17 @@ void InitLight() {
     glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
 }
 
+// 초기화 함수
+void init() {
+    glClearColor(0.0, 0.0, 0.0, 1.0);
+    InitLight();
+
+    // 투영 행렬
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(45.0, 800.0 / 600.0, 0.1, 100.0); // 원근 투영으로 3D로 보기 위해 (시야각, 가로세로비율, 가까운 거 잘라내기 먼거 잘라내기
+}
+
 // 공 업데이트 함수
 void FallingBall() {
     preVelocityY = velocityY; // 이전 속도 저장
@@ -89,8 +101,6 @@ void FallingBall() {
             isFloor = false;
         }
     }
-
-    printf("preVelocityY : %.3f \t velocityY : %.3f \t fabs(velocityY - preVelocityY) = %.5f \n", preVelocityY, velocityY, fabs(velocityY - preVelocityY));
 
     glutPostRedisplay();
 }
@@ -167,18 +177,6 @@ void MyKeyboard(unsigned char key, int x, int y) {
     }
 
     glutPostRedisplay();
-}
-
-// 초기화 함수
-void init() {
-    glClearColor(0.0, 0.0, 0.0, 1.0);
-    InitLight();
-
-    // 투영 행렬
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    gluPerspective(45.0, 800.0 / 600.0, 0.1, 100.0); // 원근 투영으로 3D로 보기 위해 (시야각, 가로세로비율, 가까운 거 잘라내기 먼거 잘라내기
-
 }
 
 // 타이머 함수
