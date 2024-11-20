@@ -1,0 +1,37 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\GitHubDesktop\\Computer-Graphics\\Final_HW\\project2\\final2\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{88733A8F-5552-4FB6-8895-A4B1379923F9}|final2.vcxproj|C:\\GitHubDesktop\\Computer-Graphics\\Final_HW\\project2\\final2\\final2.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{88733A8F-5552-4FB6-8895-A4B1379923F9}|final2.vcxproj|solutionrelative:final2.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "final2.cpp",
+              "DocumentMoniker": "C:\\GitHubDesktop\\Computer-Graphics\\Final_HW\\project2\\final2\\final2.cpp",
+              "RelativeDocumentMoniker": "final2.cpp",
+              "ToolTip": "C:\\GitHubDesktop\\Computer-Graphics\\Final_HW\\project2\\final2\\final2.cpp",
+              "RelativeToolTip": "final2.cpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2024-11-20T09:26:29.406Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
