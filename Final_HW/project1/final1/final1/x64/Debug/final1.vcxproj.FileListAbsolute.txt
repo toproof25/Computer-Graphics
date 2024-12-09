@@ -1,0 +1,2 @@
+C:\GitHubDesktop\Computer-Graphics\Final_HW\project1\final1\x64\Debug\freeglutd.dll
+C:\GitHubDesktop\Computer-Graphics\Final_HW\project1\final1\final1\x64\Debug\final1.vcxproj.Up2Date
