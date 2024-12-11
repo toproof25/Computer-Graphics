@@ -22,4 +22,9 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\..\..\..\Users\USER\Desktop\container.jpg">
+      <Filter>소스 파일</Filter>
+    </Image>
+  </ItemGroup>
 </Project>

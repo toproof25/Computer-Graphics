@@ -3,17 +3,22 @@
 #include <GL/glu.h>
 #include <algorithm>
 #include <cmath>
+#include <iostream>
+
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
 // 나무와 바닥을 위한 디스플레이 리스트
 GLuint treeDisplayList;
 GLuint groundDisplayList;
-
 GLuint signboardDisplayList;
 
 // 윈도우 크기
 const int window_width = 1600;
 const int window_height = 900;
 
+// 도움말 토글
+bool help = true;
 
 // 카메라 위치 및 방향 변수
 float cameraX = 0.0f;
@@ -34,13 +39,29 @@ bool keys[256] = { false };
 // 이동 관련 변수
 const float moveSpeed = 0.001f;
 
-const float M_PI = 3.14159265358979323846;
+// 파이
+const float PI = 3.1415; 
 
 
-// 디스플레이 리스트 생성
+// 텍스처 로드 및 생성
+unsigned int texture;
+int width, height, nrChannels;
+unsigned char* data = stbi_load("container.jpg", &width, &height, &nrChannels, 0);
+
+float vertices[] = {
+    // 위치              // 컬러             // 텍스처 좌표
+    0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // 우측 상단
+    0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // 우측 하단
+   -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // 좌측 하단
+   -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // 좌측 상단
+};
+
+
+// 디스플레이 리스트 - 입간판
 void initSignboard() {
     signboardDisplayList = glGenLists(1);
     glNewList(signboardDisplayList, GL_COMPILE);
+
 
     // 입간판 재질 설정
     GLfloat signboardMaterial[] = { 0.55f, 0.27f, 0.07f, 1.0f };
@@ -87,20 +108,23 @@ void initSignboard() {
 
     glEnd();
 
+    glBindTexture(GL_TEXTURE_2D, texture);
+
+
     // 입간판 화면 (세로 좁고 가로, 높이 긴 6면체)
     glBegin(GL_QUADS);
 
-    // 앞면
-    glVertex3f(-0.6f, 1.0f, 0.1f);
-    glVertex3f(0.6f, 1.0f, 0.1f);
-    glVertex3f(0.6f, 1.5f, 0.1f);
-    glVertex3f(-0.6f, 1.5f, 0.1f);
+    // 앞면 (텍스처 적용)
+    glTexCoord2f(0.0f, 0.0f); glVertex3f(-0.6f, 1.0f, 0.1f);
+    glTexCoord2f(1.0f, 0.0f); glVertex3f(0.6f, 1.0f, 0.1f);
+    glTexCoord2f(1.0f, 1.0f); glVertex3f(0.6f, 1.5f, 0.1f);
+    glTexCoord2f(0.0f, 1.0f); glVertex3f(-0.6f, 1.5f, 0.1f);
 
-    // 뒷면
-    glVertex3f(-0.6f, 1.0f, -0.1f);
-    glVertex3f(0.6f, 1.0f, -0.1f);
-    glVertex3f(0.6f, 1.5f, -0.1f);
-    glVertex3f(-0.6f, 1.5f, -0.1f);
+    // 뒷면 (텍스처 적용)
+    glTexCoord2f(0.0f, 0.0f); glVertex3f(-0.6f, 1.0f, -0.1f);
+    glTexCoord2f(1.0f, 0.0f); glVertex3f(0.6f, 1.0f, -0.1f);
+    glTexCoord2f(1.0f, 1.0f); glVertex3f(0.6f, 1.5f, -0.1f);
+    glTexCoord2f(0.0f, 1.0f); glVertex3f(-0.6f, 1.5f, -0.1f);
 
     // 왼쪽 면
     glVertex3f(-0.6f, 1.0f, -0.1f);
@@ -127,13 +151,15 @@ void initSignboard() {
     glVertex3f(-0.6f, 1.0f, -0.1f);
 
     glEnd();
+    glDisable(GL_TEXTURE_2D);
 
     glEndList();
 }
 
-
-// 나무와 바닥 초기화 함수
+// 디스플레이 리스트 - 나무
 void initTree() {
+
+    //
     treeDisplayList = glGenLists(1);
     glNewList(treeDisplayList, GL_COMPILE);
 
@@ -150,7 +176,9 @@ void initTree() {
     gluDeleteQuadric(quadric);
     glPopMatrix();
 
-    // 윗부분 나뭇잎 (첫 번째 원뿔)
+    
+
+    // 윗부분 나뭇잎 (첫 번째 원뿔) 
     glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, greenMaterial);
     glPushMatrix();
     glTranslatef(0, 1.0, 0);
@@ -172,7 +200,7 @@ void initTree() {
     glEndList();
 }
 
-// 바닥 초기화 함수
+// 디스플레이 리스트 - 바닥
 void initGround() {
     groundDisplayList = glGenLists(1);
     glNewList(groundDisplayList, GL_COMPILE);
@@ -214,8 +242,16 @@ void initGL() {
     glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight);
 }
 
+// 화면에 텍스트 출력
+void renderBitmapString(float x, float y, void* font, const std::string& text) {
+    glRasterPos2f(x, y);
+    for (char c : text) {
+        glutBitmapCharacter(font, c);
+    }
+}
+
 // 디스플레이 콜백 함수
-void display() {
+void MyDisplay() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 
@@ -249,11 +285,16 @@ void display() {
     glCallList(treeDisplayList);
     glPopMatrix();
 
+    if (help) {
+        renderBitmapString(-1.0f, 2.9f, GLUT_BITMAP_HELVETICA_18, "Park Scenes");
+        renderBitmapString(-1.0f, 2.8f, GLUT_BITMAP_HELVETICA_18, "Take a walk in the trees, the squirrel's sign, and the morning sun");
+    }
+
     glutSwapBuffers();
 }
 
 // 윈도우 크기 변경 콜백 함수
-void reshape(int w, int h) {
+void MyReshape(int w, int h) {
 
     // 뷰포트 및 투영 행렬 설정
     glViewport(0, 0, w, h);
@@ -268,15 +309,24 @@ void reshape(int w, int h) {
     glutWarpPointer(lastX, lastY);
 }
 
-// 키보드 입력 콜백 함수
-void keyboardDown(unsigned char key, int x, int y) {
+// 이동, 도움말, 종료 - 키보드 입력 콜백 함수
+void MyKeyboard(unsigned char key, int x, int y) {
     keys[key] = true;
+
+    // 도움말 토클
+    if (key == 'h')
+        help = !help;
+
+    // 종료
+    else if (key == 'q')
+        exit(0);
 }
 
-// 키보드 입력 해제 콜백 함수
-void keyboardUp(unsigned char key, int x, int y) {
+// 이동 멈추기 - 이동상태면 true고 idle이벤트에서 이동위치 계산 후 적용
+void MyKeyboardUp(unsigned char key, int x, int y) {
     keys[key] = false;
 }
+
 
 // 카메라 업데이트 함수
 void updateCamera() {
@@ -294,15 +344,15 @@ void updateCamera() {
         cameraZ -= lookZ * moveSpeed;
     }
     if (keys['a']) {
-        cameraX -= sin(cameraYaw + M_PI / 2) * moveSpeed;
-        cameraZ += cos(cameraYaw + M_PI / 2) * moveSpeed;
+        cameraX -= sin(cameraYaw + PI / 2) * moveSpeed;
+        cameraZ += cos(cameraYaw + PI / 2) * moveSpeed;
     }
     if (keys['d']) {
-        cameraX += sin(cameraYaw + M_PI / 2) * moveSpeed;
-        cameraZ -= cos(cameraYaw + M_PI / 2) * moveSpeed;
+        cameraX += sin(cameraYaw + PI / 2) * moveSpeed;
+        cameraZ -= cos(cameraYaw + PI / 2) * moveSpeed;
     }
 
-    // 바닥 경계 제한
+    // 바닥 못나가게
     cameraX = std::max(-10.0f, std::min(cameraX, 10.0f));
     cameraZ = std::max(-10.0f, std::min(cameraZ, 10.0f));
 
@@ -310,7 +360,7 @@ void updateCamera() {
 }
 
 // 마우스 움직임 콜백 함수
-void mouseMotion(int x, int y) {
+void MyMouseMove(int x, int y) {
     if (firstMouse) {
         lastX = x;
         lastY = y;
@@ -330,8 +380,8 @@ void mouseMotion(int x, int y) {
     cameraPitch += yoffset; // 수직 회전
 
     // 피치 각도 제한 (고개를 너무 들거나 숙이는 것 방지)
-    if (cameraPitch > M_PI / 2) cameraPitch = M_PI / 2;
-    if (cameraPitch < -M_PI / 2) cameraPitch = -M_PI / 2;
+    if (cameraPitch > PI / 2) cameraPitch = PI / 2;
+    if (cameraPitch < -PI / 2) cameraPitch = -PI / 2;
 }
 
 void idle() {
@@ -339,14 +389,14 @@ void idle() {
 }
 
 int main(int argc, char** argv) {
-
+    
     // GLUT 초기화
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
     glutInitWindowSize(window_width, window_height);
     glutCreateWindow("컴퓨터 그래픽스 기말 과제 프로젝트 1) 공원 걷기");
 
-    // 마우스 숨기기 및 고정
+    // 마우스 숨기기
     glutSetCursor(GLUT_CURSOR_NONE);
 
     // OpenGL 초기화
@@ -356,13 +406,34 @@ int main(int argc, char** argv) {
     initSignboard();
 
     // 콜백 함수 등록
-    glutDisplayFunc(display);
-    glutReshapeFunc(reshape);
-    glutKeyboardFunc(keyboardDown);
-    glutKeyboardUpFunc(keyboardUp);
-    glutPassiveMotionFunc(mouseMotion);  // 마우스 움직임 콜백
+    glutDisplayFunc(MyDisplay);
+    glutReshapeFunc(MyReshape);
+    glutKeyboardFunc(MyKeyboard);
+    glutKeyboardUpFunc(MyKeyboardUp);
+    glutPassiveMotionFunc(MyMouseMove);  // 마우스 움직임 콜백
     glutIdleFunc(idle);
 
+
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+
+    // 텍스처 wrapping/filtering 옵션 설정(현재 바인딩된 텍스처 객체에 대해)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    if (data)
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        //glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else
+    {
+        std::cout << "Failed to load texture" << std::endl;
+    }
+    stbi_image_free(data);
+
+
     glutMainLoop();
-    return 0;
+
 }

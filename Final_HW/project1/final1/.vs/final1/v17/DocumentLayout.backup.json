@@ -5,6 +5,9 @@
     {
       "AbsoluteMoniker": "D:0:0:{874671F4-FC15-46BD-A21B-089257CFA65D}|final1.vcxproj|C:\\GitHubDesktop\\Computer-Graphics\\Final_HW\\project1\\final1\\final1.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{874671F4-FC15-46BD-A21B-089257CFA65D}|final1.vcxproj|solutionrelative:final1.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\GitHubDesktop\\Computer-Graphics\\Final_HW\\stb-master\\stb_image.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     }
   ],
   "DocumentGroupContainers": [
@@ -14,17 +17,30 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 1,
           "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "stb_image.h",
+              "DocumentMoniker": "C:\\GitHubDesktop\\Computer-Graphics\\Final_HW\\stb-master\\stb_image.h",
+              "RelativeDocumentMoniker": "..\\..\\stb-master\\stb_image.h",
+              "ToolTip": "C:\\GitHubDesktop\\Computer-Graphics\\Final_HW\\stb-master\\stb_image.h",
+              "RelativeToolTip": "..\\..\\stb-master\\stb_image.h",
+              "ViewState": "AgIAACIbAAAAAAAAAADwvzIbAAANAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2024-12-11T11:14:40.114Z",
+              "EditorCaption": ""
+            },
             {
               "$type": "Document",
               "DocumentIndex": 0,
               "Title": "final1.cpp",
               "DocumentMoniker": "C:\\GitHubDesktop\\Computer-Graphics\\Final_HW\\project1\\final1\\final1.cpp",
               "RelativeDocumentMoniker": "final1.cpp",
-              "ToolTip": "C:\\GitHubDesktop\\Computer-Graphics\\Final_HW\\project1\\final1\\final1.cpp*",
-              "RelativeToolTip": "final1.cpp*",
-              "ViewState": "AgIAACIAAAAAAAAAAAAAwD4AAAABAAAAAAAAAA==",
+              "ToolTip": "C:\\GitHubDesktop\\Computer-Graphics\\Final_HW\\project1\\final1\\final1.cpp",
+              "RelativeToolTip": "final1.cpp",
+              "ViewState": "AgIAAGMAAAAAAAAAAAAAwG0AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2024-11-20T09:13:59.632Z",
               "EditorCaption": ""
