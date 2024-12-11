@@ -1,59 +1,78 @@
-#include <GL/glut.h>
-#include <GL/gl.h>
+﻿#include <GL/glut.h>
 #include <GL/glu.h>
+#include <GL/gl.h>
+
 #include <algorithm>
 #include <cmath>
 #include <iostream>
 
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
-
-// 나무와 바닥을 위한 디스플레이 리스트
+// 나무, 바닥, 입간판
 GLuint treeDisplayList;
 GLuint groundDisplayList;
 GLuint signboardDisplayList;
 
 // 윈도우 크기
-const int window_width = 1600;
-const int window_height = 900;
+const int window_width = 1920;
+const int window_height = 1080;
 
 // 도움말 토글
 bool help = true;
 
-// 카메라 위치 및 방향 변수
+// 카메라 위치, 방향
 float cameraX = 0.0f;
-float cameraY = 2.0f;
+float cameraY = 1.0f;
 float cameraZ = 5.0f;
-float cameraYaw = 0.0f;    // 수평 회전 (y축 기준)
-float cameraPitch = 0.0f;  // 수직 회전 (x축 기준)
+float cameraYaw = 0.0f;    // 수평 회전
+float cameraPitch = 0.0f;  // 수직 회전
 
 // 마우스 관련 변수
-int lastX = window_width/2;  // 윈도우 중앙 X
-int lastY = window_height/2;  // 윈도우 중앙 Y
-bool firstMouse = true;
-const float mouseSensitivity = 0.001f;
+int lastX = window_width/2;  // 윈도우 중앙을 0으로
+int lastY = window_height/2;
 
-// 키 상태 추적 변수
+bool firstMoveMouse = true; // 처음 움직일 때 lastX, lastY을 저장하기 위해
+
+const float mouseSpeed = 0.005f; //   마우스 속도
+
+// 키 상태 - 키에 모든 배열을 false로 초기화 -> W, A, S, D 키에 대해서 true로 설정
 bool keys[256] = { false };
+bool W = false, A = false, S = false, D = false;
 
 // 이동 관련 변수
 const float moveSpeed = 0.001f;
 
 // 파이
-const float PI = 3.1415; 
+const float PI = 3.14; 
 
+bool morning = true;  // 아침 or 저녁 여부
+GLfloat morningLight[] = { 0.5f, 1.0f, 0.5f, 0.0f };
+GLfloat morningAmbient[] = { 0.3f, 0.3f, 0.4f, 1.0f };  
+GLfloat morningDiffuse[] = { 1.0f, 1.0f, 1.0f, 1.0f }; 
 
-// 텍스처 로드 및 생성
-unsigned int texture;
-int width, height, nrChannels;
-unsigned char* data = stbi_load("container.jpg", &width, &height, &nrChannels, 0);
+GLfloat eveningLight[] = { -0.5f, 0.2f, -0.5f, 0.0f };  
+GLfloat eveningAmbient[] = { 0.4f, 0.3f, 0.2f, 1.0f };  
+GLfloat eveningDiffuse[] = { 1.0f, 0.8f, 0.5f, 1.0f };  
 
-float vertices[] = {
-    // 위치              // 컬러             // 텍스처 좌표
-    0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // 우측 상단
-    0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // 우측 하단
-   -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // 좌측 하단
-   -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // 좌측 상단
+// 나무 위치 
+const int numTrees = 100; // 나무 개수
+const float treePositions[numTrees][2] = {
+    { -14.0f,  12.5f}, { 10.5f, -14.2f}, {  3.0f, -13.0f}, { -8.0f,  14.5f}, {  9.0f,   7.0f},
+    { -15.0f,   4.0f}, { 12.0f,   6.5f}, { -13.5f, -5.0f}, {  7.5f, -12.0f}, { -2.0f,  10.0f},
+    { 11.0f,   3.5f}, { -6.0f,  -8.0f}, {  5.5f,  11.5f}, { -4.0f, -14.0f}, {  3.5f,  15.0f},
+    { -11.0f,   0.5f}, { 14.5f,  -9.0f}, { -5.5f,   7.0f}, { 12.5f, -12.0f}, { -10.0f,  14.5f},
+    {  8.5f,  -6.0f}, { -3.5f,   8.0f}, {  7.0f,   9.5f}, { -14.5f, -10.0f}, { 13.0f, -11.0f},
+    { -12.0f,   4.5f}, {  4.0f, -15.0f}, { -7.5f,  13.5f}, { 11.5f,   2.0f}, {  6.5f, -14.0f},
+    {  3.0f,  12.0f}, { -10.5f,  14.0f}, {  2.0f,   5.5f}, {  9.5f, -13.5f}, { -8.5f,  15.0f},
+    { 14.0f,   6.0f}, { 12.0f,  -2.5f}, {  5.5f,  13.0f}, { -15.0f,  -3.0f}, { 10.5f,  -9.0f},
+    { -13.0f,  -7.5f}, {  6.0f,  10.5f}, {  8.0f,  -5.5f}, { -7.0f,  11.0f}, { 13.5f,   0.0f},
+    {  1.5f,   6.5f}, {  4.5f, -10.0f}, { -9.5f,   8.0f}, { -14.5f,   3.0f}, {  7.5f, -11.5f},
+    { -5.0f,  14.5f}, { 15.0f,  -6.5f}, { -3.0f,   5.0f}, {  9.0f,   8.5f}, { -12.5f, -13.0f},
+    { 11.0f,  -4.5f}, {  8.5f,  14.0f}, { -4.5f, -12.0f}, {  3.5f,  15.0f}, { -10.0f,  13.0f},
+    {  2.5f,   6.0f}, { 12.0f, -10.5f}, { -6.5f,   8.0f}, {  5.0f,  -3.5f}, { 14.5f,  -2.0f},
+    {  0.0f,  10.0f}, { -15.0f, -14.0f}, {  7.0f,  12.5f}, { -13.0f,   9.0f}, { 11.5f,   4.5f},
+    {  6.5f, -12.0f}, { -8.5f,  10.0f}, {  3.0f,  -6.5f}, { -14.0f,   0.5f}, { 15.0f,   9.5f},
+    { -5.0f,   7.5f}, {  9.0f, -13.5f}, { -4.0f,  11.0f}, { 12.5f,  -8.0f}, {  8.0f,   3.5f},
+    { -9.5f,   6.0f}, { 14.5f, -10.0f}, {  4.0f,  15.0f}, { -6.0f,  -9.5f}, { 13.0f,   2.0f},
+    {  7.5f,  -4.0f}, { -11.5f,  13.5f}, {  6.0f,   8.0f}, { -14.5f,   4.5f}, { 10.5f,  -7.0f}
 };
 
 
@@ -73,32 +92,32 @@ void initSignboard() {
     // 앞면
     glVertex3f(-0.1f, 0.0f, 0.1f);
     glVertex3f(0.1f, 0.0f, 0.1f);
-    glVertex3f(0.1f, 1.0f, 0.1f);
-    glVertex3f(-0.1f, 1.0f, 0.1f);
+    glVertex3f(0.1f, 0.5f, 0.1f);
+    glVertex3f(-0.1f, 0.5f, 0.1f);
 
     // 뒷면
     glVertex3f(-0.1f, 0.0f, -0.1f);
     glVertex3f(0.1f, 0.0f, -0.1f);
-    glVertex3f(0.1f, 1.0f, -0.1f);
-    glVertex3f(-0.1f, 1.0f, -0.1f);
+    glVertex3f(0.1f, 0.5f, -0.1f);
+    glVertex3f(-0.1f, 0.5f, -0.1f);
 
     // 왼쪽 면
     glVertex3f(-0.1f, 0.0f, -0.1f);
     glVertex3f(-0.1f, 0.0f, 0.1f);
-    glVertex3f(-0.1f, 1.0f, 0.1f);
-    glVertex3f(-0.1f, 1.0f, -0.1f);
+    glVertex3f(-0.1f, 0.5f, 0.1f);
+    glVertex3f(-0.1f, 0.5f, -0.1f);
 
     // 오른쪽 면
     glVertex3f(0.1f, 0.0f, -0.1f);
     glVertex3f(0.1f, 0.0f, 0.1f);
-    glVertex3f(0.1f, 1.0f, 0.1f);
-    glVertex3f(0.1f, 1.0f, -0.1f);
+    glVertex3f(0.1f, 0.5f, 0.1f);
+    glVertex3f(0.1f, 0.5f, -0.1f);
 
     // 윗면
-    glVertex3f(-0.1f, 1.0f, 0.1f);
-    glVertex3f(0.1f, 1.0f, 0.1f);
-    glVertex3f(0.1f, 1.0f, -0.1f);
-    glVertex3f(-0.1f, 1.0f, -0.1f);
+    glVertex3f(-0.1f, 0.5f, 0.1f);
+    glVertex3f(0.1f, 0.5f, 0.1f);
+    glVertex3f(0.1f, 0.5f, -0.1f);
+    glVertex3f(-0.1f, 0.5f, -0.1f);
 
     // 아랫면
     glVertex3f(-0.1f, 0.0f, 0.1f);
@@ -108,47 +127,44 @@ void initSignboard() {
 
     glEnd();
 
-    glBindTexture(GL_TEXTURE_2D, texture);
-
-
     // 입간판 화면 (세로 좁고 가로, 높이 긴 6면체)
     glBegin(GL_QUADS);
 
     // 앞면 (텍스처 적용)
-    glTexCoord2f(0.0f, 0.0f); glVertex3f(-0.6f, 1.0f, 0.1f);
-    glTexCoord2f(1.0f, 0.0f); glVertex3f(0.6f, 1.0f, 0.1f);
-    glTexCoord2f(1.0f, 1.0f); glVertex3f(0.6f, 1.5f, 0.1f);
-    glTexCoord2f(0.0f, 1.0f); glVertex3f(-0.6f, 1.5f, 0.1f);
+    glVertex3f(-0.6f, 0.5f, 0.1f);
+    glVertex3f(0.6f, 0.5f, 0.1f);
+    glVertex3f(0.6f, 1.0f, 0.1f);
+    glVertex3f(-0.6f, 1.0f, 0.1f);
 
     // 뒷면 (텍스처 적용)
-    glTexCoord2f(0.0f, 0.0f); glVertex3f(-0.6f, 1.0f, -0.1f);
-    glTexCoord2f(1.0f, 0.0f); glVertex3f(0.6f, 1.0f, -0.1f);
-    glTexCoord2f(1.0f, 1.0f); glVertex3f(0.6f, 1.5f, -0.1f);
-    glTexCoord2f(0.0f, 1.0f); glVertex3f(-0.6f, 1.5f, -0.1f);
+    glVertex3f(-0.6f, 0.5f, -0.1f);
+    glVertex3f(0.6f, 0.5f, -0.1f);
+    glVertex3f(0.6f, 1.0f, -0.1f);
+    glVertex3f(-0.6f, 1.0f, -0.1f);
 
     // 왼쪽 면
-    glVertex3f(-0.6f, 1.0f, -0.1f);
+    glVertex3f(-0.6f, 0.5f, -0.1f);
+    glVertex3f(-0.6f, 0.5f, 0.1f);
     glVertex3f(-0.6f, 1.0f, 0.1f);
-    glVertex3f(-0.6f, 1.5f, 0.1f);
-    glVertex3f(-0.6f, 1.5f, -0.1f);
+    glVertex3f(-0.6f, 1.0f, -0.1f);
 
     // 오른쪽 면
-    glVertex3f(0.6f, 1.0f, -0.1f);
+    glVertex3f(0.6f, 0.5f, -0.1f);
+    glVertex3f(0.6f, 0.5f, 0.1f);
     glVertex3f(0.6f, 1.0f, 0.1f);
-    glVertex3f(0.6f, 1.5f, 0.1f);
-    glVertex3f(0.6f, 1.5f, -0.1f);
+    glVertex3f(0.6f, 1.0f, -0.1f);
 
     // 윗면
-    glVertex3f(-0.6f, 1.5f, 0.1f);
-    glVertex3f(0.6f, 1.5f, 0.1f);
-    glVertex3f(0.6f, 1.5f, -0.1f);
-    glVertex3f(-0.6f, 1.5f, -0.1f);
-
-    // 아랫면
     glVertex3f(-0.6f, 1.0f, 0.1f);
     glVertex3f(0.6f, 1.0f, 0.1f);
     glVertex3f(0.6f, 1.0f, -0.1f);
     glVertex3f(-0.6f, 1.0f, -0.1f);
+
+    // 아랫면
+    glVertex3f(-0.6f, 0.5f, 0.1f);
+    glVertex3f(0.6f, 0.5f, 0.1f);
+    glVertex3f(0.6f, 0.5f, -0.1f);
+    glVertex3f(-0.6f, 0.5f, -0.1f);
 
     glEnd();
     glDisable(GL_TEXTURE_2D);
@@ -175,8 +191,6 @@ void initTree() {
     gluCylinder(quadric, 0.2, 0.2, 1.0, 20, 1);
     gluDeleteQuadric(quadric);
     glPopMatrix();
-
-    
 
     // 윗부분 나뭇잎 (첫 번째 원뿔) 
     glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, greenMaterial);
@@ -213,38 +227,42 @@ void initGround() {
     glBegin(GL_QUADS);
     // 바닥면
     glNormal3f(0, 1, 0);
-    glVertex3f(-10, 0, -10);
-    glVertex3f(10, 0, -10);
-    glVertex3f(10, 0, 10);
-    glVertex3f(-10, 0, 10);
+    glVertex3f(-15, 0, -15);
+    glVertex3f(15, 0, -15);
+    glVertex3f(15, 0, 15);
+    glVertex3f(-15, 0, 15);
     glEnd();
 
     glEndList();
 }
 
 // OpenGL 초기화 함수
-void initGL() {
-
+void initLight() {
     // 렌더링 설정
-    glClearColor(0.7f, 0.9f, 1.0f, 1.0f);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
 
-    // 빛 설정
-    GLfloat lightPosition[] = { 1.0f, 1.0f, 1.0f, 0.0f };
-    GLfloat ambientLight[] = { 0.2f, 0.2f, 0.2f, 1.0f };
-    GLfloat diffuseLight[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+    if (morning) {
+        glClearColor(0.7f, 0.9f, 1.0f, 1.0f);
+        // 빛 위치 및 색 설정
+        glLightfv(GL_LIGHT0, GL_POSITION, morningLight);
+        glLightfv(GL_LIGHT0, GL_AMBIENT, morningAmbient);
+        glLightfv(GL_LIGHT0, GL_DIFFUSE, morningDiffuse);
+    }
+    else {
+        glClearColor(0.9f, 0.6f, 0.4f, 1.0f);
+        // 빛 위치 및 색 설정
+        glLightfv(GL_LIGHT0, GL_POSITION, eveningLight);
+        glLightfv(GL_LIGHT0, GL_AMBIENT, eveningAmbient);
+        glLightfv(GL_LIGHT0, GL_DIFFUSE, eveningDiffuse);
+    }
 
-    // 빛 위치 및 색 설정
-    glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
-    glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight);
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight);
 }
 
 // 화면에 텍스트 출력
-void renderBitmapString(float x, float y, void* font, const std::string& text) {
-    glRasterPos2f(x, y);
+void CreateText(float x, float y, float z, void* font, const std::string& text) {
+    glRasterPos3f(x, y, z);
     for (char c : text) {
         glutBitmapCharacter(font, c);
     }
@@ -271,23 +289,27 @@ void MyDisplay() {
     glCallList(groundDisplayList);
 
     // 입간판 렌더링
+    glPushMatrix();
+    glTranslatef(3, 0, 3); // X, Z 위치로 이동
     glCallList(signboardDisplayList);
-
-    // 나무 렌더링
-    glPushMatrix();
-    glTranslatef(5, 0, 0);
-    glCallList(treeDisplayList);
     glPopMatrix();
 
     // 나무 렌더링
-    glPushMatrix();
-    glTranslatef(-5, 0, 0);
-    glCallList(treeDisplayList);
-    glPopMatrix();
+    for (int i = 0; i < numTrees; ++i) {
+        glPushMatrix();
+        glTranslatef(treePositions[i][0], 0, treePositions[i][1]); // X, Z 위치로 이동
+        glCallList(treeDisplayList); // 나무 렌더링
+        glPopMatrix();
+    }
 
+    // 도움말 출력
     if (help) {
-        renderBitmapString(-1.0f, 2.9f, GLUT_BITMAP_HELVETICA_18, "Park Scenes");
-        renderBitmapString(-1.0f, 2.8f, GLUT_BITMAP_HELVETICA_18, "Take a walk in the trees, the squirrel's sign, and the morning sun");
+        CreateText(2.9f, 0.8f, 3.2f, GLUT_BITMAP_HELVETICA_18, "Squirrel Dangerous Zone!");
+        CreateText(0.0f, 1.9f, 1.5f, GLUT_BITMAP_HELVETICA_18, "Park Scenes");
+        CreateText(0.0f, 1.8f, 1.5f, GLUT_BITMAP_HELVETICA_18, "Move with W, A, S, D");
+        CreateText(0.0f, 1.7f, 1.5f, GLUT_BITMAP_HELVETICA_18, "Rotate with the mouse");
+        CreateText(0.0f, 1.6f, 1.5f, GLUT_BITMAP_HELVETICA_18, "Press L to switch between day and night");
+        CreateText(0.0f, 1.5f, 1.5f, GLUT_BITMAP_HELVETICA_18, "Press H to toggle the help menu");
     }
 
     glutSwapBuffers();
@@ -295,8 +317,7 @@ void MyDisplay() {
 
 // 윈도우 크기 변경 콜백 함수
 void MyReshape(int w, int h) {
-
-    // 뷰포트 및 투영 행렬 설정
+    // 뷰포트, 투영 행렬 설정
     glViewport(0, 0, w, h);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -311,43 +332,91 @@ void MyReshape(int w, int h) {
 
 // 이동, 도움말, 종료 - 키보드 입력 콜백 함수
 void MyKeyboard(unsigned char key, int x, int y) {
-    keys[key] = true;
 
-    // 도움말 토클
-    if (key == 'h')
-        help = !help;
+    switch (key)
+    {
+        // 종료
+        case 'q': case'Q': case '\033': 
+            exit(0);
+            break;
 
-    // 종료
-    else if (key == 'q')
-        exit(0);
+        // 도움말 토글
+        case 'h': 
+            help = !help;
+            break;
+
+        // 아침, 저녁 바꾸기
+        case 'l':
+            morning = !morning;
+            initLight();
+            break;
+        
+        // 이동
+        case 'w':
+            W = true;
+            break;
+
+        case 's':
+            S = true;
+            break;
+
+        case 'a':
+            A = true;
+            break;
+
+        case 'd':
+            D = true;
+            break;
+    }
+
 }
 
 // 이동 멈추기 - 이동상태면 true고 idle이벤트에서 이동위치 계산 후 적용
 void MyKeyboardUp(unsigned char key, int x, int y) {
-    keys[key] = false;
+    switch (key)
+    {
+        case 'w':
+            W = false;
+            break;
+
+        case 's':
+            S = false;
+            break;
+
+        case 'a':
+            A = false;
+            break;
+
+        case 'd':
+            D = false;
+            break;
+    }
+
 }
 
-
 // 카메라 업데이트 함수
-void updateCamera() {
-    // 카메라 방향 벡터 계산
+void MyCamera() {
+
+    // 카메라 앞 뒤 방향
     float lookX = sin(cameraYaw) * cos(cameraPitch);
     float lookZ = -cos(cameraYaw) * cos(cameraPitch);
 
-    // 이동 벡터 계산
-    if (keys['w']) {
-        cameraX += lookX * moveSpeed;
+    // 앞 뒤 이동
+    if (W) {
+        cameraX += lookX * moveSpeed; 
         cameraZ += lookZ * moveSpeed;
     }
-    if (keys['s']) {
+    if (S) {
         cameraX -= lookX * moveSpeed;
         cameraZ -= lookZ * moveSpeed;
     }
-    if (keys['a']) {
-        cameraX -= sin(cameraYaw + PI / 2) * moveSpeed;
+
+    // 좌 우 이동 - 카메라 기준 90도 방향으로 이동
+    if (A) {
+        cameraX -= sin(cameraYaw + PI / 2) * moveSpeed; 
         cameraZ += cos(cameraYaw + PI / 2) * moveSpeed;
     }
-    if (keys['d']) {
+    if (D) {
         cameraX += sin(cameraYaw + PI / 2) * moveSpeed;
         cameraZ -= cos(cameraYaw + PI / 2) * moveSpeed;
     }
@@ -361,31 +430,31 @@ void updateCamera() {
 
 // 마우스 움직임 콜백 함수
 void MyMouseMove(int x, int y) {
-    if (firstMouse) {
+
+    // 처음 움직일 때 마우스 위치 저장
+    if (firstMoveMouse) {
         lastX = x;
         lastY = y;
-        firstMouse = false;
+        firstMoveMouse = false;
     }
 
-    float xoffset = x - lastX;
-    float yoffset = lastY - y;  // 역순으로 계산 (y 좌표는 위로 갈수록 작아짐)
+    // 마우스 이동 계산
+    float xoffset = x - (float)lastX;
+    float yoffset = (float)lastY - y;  // 역순으로 계산 (y 좌표는 위로 갈수록 작아짐)
 
     lastX = x;
     lastY = y;
 
-    xoffset *= mouseSensitivity;
-    yoffset *= mouseSensitivity;
+    // 마우스 속도에 맞게 위치 설정
+    xoffset *= mouseSpeed;
+    yoffset *= mouseSpeed;
 
-    cameraYaw += xoffset;   // 수평 회전
-    cameraPitch += yoffset; // 수직 회전
-
-    // 피치 각도 제한 (고개를 너무 들거나 숙이는 것 방지)
-    if (cameraPitch > PI / 2) cameraPitch = PI / 2;
-    if (cameraPitch < -PI / 2) cameraPitch = -PI / 2;
+    cameraYaw += xoffset;   // 수평 
+    cameraPitch += yoffset; // 수직 
 }
 
 void idle() {
-    updateCamera();
+    MyCamera();
 }
 
 int main(int argc, char** argv) {
@@ -400,39 +469,18 @@ int main(int argc, char** argv) {
     glutSetCursor(GLUT_CURSOR_NONE);
 
     // OpenGL 초기화
-    initGL();
+    initLight();
     initTree();
     initGround();
     initSignboard();
 
     // 콜백 함수 등록
     glutDisplayFunc(MyDisplay);
-    glutReshapeFunc(MyReshape);
-    glutKeyboardFunc(MyKeyboard);
-    glutKeyboardUpFunc(MyKeyboardUp);
-    glutPassiveMotionFunc(MyMouseMove);  // 마우스 움직임 콜백
+    glutReshapeFunc(MyReshape); 
+    glutKeyboardFunc(MyKeyboard); // 키보드 입력 시
+    glutKeyboardUpFunc(MyKeyboardUp); // 키보드 땠을 때
+    glutPassiveMotionFunc(MyMouseMove);  // 마우스
     glutIdleFunc(idle);
-
-
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
-
-    // 텍스처 wrapping/filtering 옵션 설정(현재 바인딩된 텍스처 객체에 대해)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    if (data)
-    {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-        //glGenerateMipmap(GL_TEXTURE_2D);
-    }
-    else
-    {
-        std::cout << "Failed to load texture" << std::endl;
-    }
-    stbi_image_free(data);
-
 
     glutMainLoop();
 
