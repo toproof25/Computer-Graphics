@@ -7,10 +7,11 @@
 #include <iostream>
 
 #include <stdio.h>
-#include <windows.h>
 #include <iostream>
 #include <fstream>
 #include <vector>
+
+#include <filesystem>
 
 typedef struct _AUX_RGBImageRec {
     GLint sizeX, sizeY;
@@ -20,7 +21,6 @@ typedef struct _AUX_RGBImageRec {
 unsigned int MyTextureObject[5];
 AUX_RGBImageRec* pTextureImage[5];  //텍스쳐 저장 공간을 가리키는 포인터
 
-// BMP파일을 읽어 AUX_RGBImageRec 구조체에 저장하는 LoadBMP 함수
 AUX_RGBImageRec* LoadBMP(const char* filename) {
     std::ifstream file(filename, std::ios::binary);
     if (!file) {
@@ -72,43 +72,40 @@ AUX_RGBImageRec* LoadBMP(const char* filename) {
     file.close();
     return texture;
 }
+// 텍스처 로드 함수
+int LoadGLTextures(const std::string& directory) {
+    int textureIndex = 0;
 
-int LoadGLTextures(char* szFilePath, int i) {  // 파일 로드 텍스쳐로 변환
-    int Status = FALSE;
+    // 디렉토리 내 BMP 파일 탐색
+    for (const auto& entry : std::filesystem::directory_iterator(directory)) {
+        if (entry.path().extension() == ".bmp" && textureIndex < 5) {
+            std::string filepath = entry.path().string();
 
-    glClearColor(0.0, 0.0, 0.0, 0.5);
-    memset(pTextureImage, 0, sizeof(void*) * 10); // NULL로 초기화
+            // 텍스처 이미지 로드
+            AUX_RGBImageRec* texture = LoadBMP(filepath.c_str());
+            if (texture) {
+                glGenTextures(1, &MyTextureObject[textureIndex]);
+                glBindTexture(GL_TEXTURE_2D, MyTextureObject[textureIndex]);
+                glTexImage2D(GL_TEXTURE_2D, 0, 3, texture->sizeX, texture->sizeY, 0, GL_RGB, GL_UNSIGNED_BYTE, texture->data);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    // 텍스쳐 이미지 로드
-    if (pTextureImage[i] = LoadBMP((char*)szFilePath)) {  
-        Status = TRUE; 
-        glGenTextures(1, &MyTextureObject[i]);  
-        glBindTexture(GL_TEXTURE_2D, MyTextureObject[i]);
-        glTexImage2D(GL_TEXTURE_2D, 0, 3,
-            pTextureImage[i]->sizeX, pTextureImage[i]->sizeY,
-            0, GL_RGB, GL_UNSIGNED_BYTE, pTextureImage[i]->data);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glEnable(GL_TEXTURE_2D);
-    }
+                // 텍스처 메모리 해제
+                delete[] texture->data;
+                delete texture;
 
-    // 메모리 해제
-    if (pTextureImage[i]) {
-        if (pTextureImage[i]->data) {  
-            free(pTextureImage[i]->data);  
+                textureIndex++;
+            }
         }
-        free(pTextureImage[i]); 
     }
 
-    return Status;
+    return textureIndex; // 성공적으로 로드된 텍스처 개수 반환
 }
-
 
 //********************************************************************************************************************
 
 // 나무, 바닥, 입간판
 GLuint treeDisplayList;
-GLuint groundDisplayList;
 
 // 윈도우 크기
 const int window_width = 1920;
@@ -222,7 +219,7 @@ void CreatSignboard() {
 
     // 텍스처 활성화는 입간판 화면을 그리기 직전에
     glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, MyTextureObject[0]);
+    glBindTexture(GL_TEXTURE_2D, MyTextureObject[2]);
 
     // 입간판 화면 (세로 좁고 가로, 높이 긴 6면체) 
     glBegin(GL_QUADS);
@@ -283,7 +280,7 @@ void initTree() {
 
     // 텍스처 활성화
     glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, MyTextureObject[2]);
+    glBindTexture(GL_TEXTURE_2D, MyTextureObject[4]);
 
     // 줄기 (원기둥)
     glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, brownMaterial);
@@ -361,7 +358,6 @@ void CreateText(float x, float y, float z, void* font, const std::string& text) 
 }
 
 
-
 void Skybox() {
     int TEX_SIZE = 3;
 
@@ -374,7 +370,7 @@ void Skybox() {
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
     //glColor3f(0, 0, 0);
 
-    glBindTexture(GL_TEXTURE_2D, MyTextureObject[4]);
+    glBindTexture(GL_TEXTURE_2D, MyTextureObject[0]);
 
     glBegin(GL_QUADS);
     glTexCoord2f(0.0, 0.0); glVertex3f(-TEX_SIZE, -TEX_SIZE, -TEX_SIZE);
@@ -383,7 +379,7 @@ void Skybox() {
     glTexCoord2f(0.0, 1.0); glVertex3f(-TEX_SIZE, TEX_SIZE, -TEX_SIZE);
     glEnd();
 
-    glBindTexture(GL_TEXTURE_2D, MyTextureObject[4]);
+    glBindTexture(GL_TEXTURE_2D, MyTextureObject[0]);
     glBegin(GL_QUADS);
     glTexCoord2f(0.0, 0.0); glVertex3f(TEX_SIZE, -TEX_SIZE, TEX_SIZE);
     glTexCoord2f(1.0, 0.0); glVertex3f(-TEX_SIZE, -TEX_SIZE, TEX_SIZE);
@@ -392,7 +388,7 @@ void Skybox() {
     glEnd();
 
     // 좌
-    glBindTexture(GL_TEXTURE_2D, MyTextureObject[4]);
+    glBindTexture(GL_TEXTURE_2D, MyTextureObject[0]);
     glBegin(GL_QUADS);
     glTexCoord2f(0.0, 0.0); glVertex3f(TEX_SIZE, -TEX_SIZE, -TEX_SIZE);
     glTexCoord2f(1.0, 0.0); glVertex3f(TEX_SIZE, -TEX_SIZE, TEX_SIZE);
@@ -401,7 +397,7 @@ void Skybox() {
     glEnd();
 
     // 우
-    glBindTexture(GL_TEXTURE_2D, MyTextureObject[4]);
+    glBindTexture(GL_TEXTURE_2D, MyTextureObject[0]);
     glBegin(GL_QUADS);
     glTexCoord2f(0.0, 0.0); glVertex3f(-TEX_SIZE, -TEX_SIZE, TEX_SIZE);
     glTexCoord2f(1.0, 0.0); glVertex3f(-TEX_SIZE, -TEX_SIZE, -TEX_SIZE);
@@ -410,7 +406,7 @@ void Skybox() {
     glEnd();
 
     // 위
-    glBindTexture(GL_TEXTURE_2D, MyTextureObject[4]);
+    glBindTexture(GL_TEXTURE_2D, MyTextureObject[0]);
     glBegin(GL_QUADS);
     glTexCoord2f(0.0, 0.0); glVertex3f(-TEX_SIZE, TEX_SIZE, -TEX_SIZE);
     glTexCoord2f(1.0, 0.0); glVertex3f(TEX_SIZE, TEX_SIZE, -TEX_SIZE);
@@ -419,7 +415,7 @@ void Skybox() {
     glEnd();
 
     // 아래
-    glBindTexture(GL_TEXTURE_2D, MyTextureObject[4]);
+    glBindTexture(GL_TEXTURE_2D, MyTextureObject[0]);
     glBegin(GL_QUADS);
     glTexCoord2f(0.0, 0.0); glVertex3f(-TEX_SIZE, -TEX_SIZE, TEX_SIZE);
     glTexCoord2f(1.0, 0.0); glVertex3f(TEX_SIZE, -TEX_SIZE, TEX_SIZE);
@@ -461,9 +457,6 @@ void MyDisplay() {
     glPopMatrix();
 
     // 바닥 렌더링
-    //glCallList(groundDisplayList);
-    // 텍스처 활성화는 입간판 화면을 그리기 직전에
-    // 기존 재질
     GLfloat defaultMaterial[] = { 1.0f, 1.0f, 1.0f, 1.0f };  // 기본 Ambient 값
     glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, defaultMaterial);
 
@@ -645,51 +638,42 @@ void idle() {
 
 int main(int argc, char** argv) {
 
-    if (argc <= 1) {
-        printf("\n%s\n\n", "Usage : TextureDLG3_Consol.exe [BMPFileName.bmp]");
-        exit(1);
-    }
-    else {
-        // GLUT 초기화
-        glutInit(&argc, argv);
-        glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-        glutInitWindowSize(window_width, window_height);
-        glutCreateWindow("컴퓨터 그래픽스 기말 과제 프로젝트 1) 공원 걷기");
+    // GLUT 초기화
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+    glutInitWindowSize(window_width, window_height);
+    glutCreateWindow("컴퓨터 그래픽스 기말 과제 프로젝트 1) 공원 걷기");
 
-        // 마우스 숨기기
-        glutSetCursor(GLUT_CURSOR_NONE);
+    // 마우스 숨기기
+    glutSetCursor(GLUT_CURSOR_NONE);
 
-        // 각 BMP 파일을 텍스처로 로드
-        for (int i = 1; i < argc; i++) {
-            if (LoadGLTextures(argv[i], i - 1)) {
-                glEnable(GL_TEXTURE_2D);
-            }
-            else {
-                printf("Texture loading failed for %s\n", argv[i]);
-                exit(1);
-            }
-        }
+    /*
+        실행 파일이 있는 경로로 텍스처 로드
+        기존에 명령 인수에 넣고 로드하였으나, exe파일로 실행 시 명령 인수가 실행이 안됨 (argc값이 안나옴)
+        현재 폴더에 있는 bmp파일을 불러와서 텍스처로 사용
+    */
+    std::string exeDirectory = std::filesystem::current_path().string();
+    int loadedTextures = LoadGLTextures(exeDirectory);
         
-        glEnable(GL_TEXTURE_2D);
-        glShadeModel(GL_SMOOTH);
-        glClearDepth(1.0);
-        glEnable(GL_DEPTH_TEST);
-        glDepthFunc(GL_LEQUAL);
-        glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+    glEnable(GL_TEXTURE_2D);
+    glShadeModel(GL_SMOOTH);
+    glClearDepth(1.0);
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
+    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
-        // OpenGL 초기화
-        initLight();
-        initTree();
+    // OpenGL 초기화
+    initLight();
+    initTree();
 
-        // 콜백 함수 등록
-        glutDisplayFunc(MyDisplay);
-        glutReshapeFunc(MyReshape);
-        glutKeyboardFunc(MyKeyboard); // 키보드 입력 시
-        glutKeyboardUpFunc(MyKeyboardUp); // 키보드 땠을 때
-        glutPassiveMotionFunc(MyMouseMove);  // 마우스
-        glutIdleFunc(idle);
+    // 콜백 함수 등록
+    glutDisplayFunc(MyDisplay);
+    glutReshapeFunc(MyReshape);
+    glutKeyboardFunc(MyKeyboard); // 키보드 입력 시
+    glutKeyboardUpFunc(MyKeyboardUp); // 키보드 땠을 때
+    glutPassiveMotionFunc(MyMouseMove);  // 마우스
+    glutIdleFunc(idle);
 
-        glutMainLoop();
-  
-    }
+    glutMainLoop();
+
 }

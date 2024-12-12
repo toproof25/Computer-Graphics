@@ -4,4 +4,8 @@
     <LocalDebuggerCommandArguments>signs.bmp green.bmp wood.bmp wall.bmp clouds.bmp</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LocalDebuggerCommandArguments>signs.bmp green.bmp wood.bmp wall.bmp clouds.bmp</LocalDebuggerCommandArguments>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
 </Project>

@@ -22,4 +22,27 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="clock.bmp">
+      <Filter>소스 파일</Filter>
+    </Image>
+    <Image Include="clouds.bmp">
+      <Filter>소스 파일</Filter>
+    </Image>
+    <Image Include="green.bmp">
+      <Filter>소스 파일</Filter>
+    </Image>
+    <Image Include="ground.bmp">
+      <Filter>소스 파일</Filter>
+    </Image>
+    <Image Include="roundClock.bmp">
+      <Filter>소스 파일</Filter>
+    </Image>
+    <Image Include="wall.bmp">
+      <Filter>소스 파일</Filter>
+    </Image>
+    <Image Include="wood.bmp">
+      <Filter>소스 파일</Filter>
+    </Image>
+  </ItemGroup>
 </Project>

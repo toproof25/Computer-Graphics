@@ -7,20 +7,22 @@
 #include <iostream>
 
 #include <stdio.h>
-#include <windows.h>
 #include <iostream>
 #include <fstream>
 #include <vector>
 
+#include <filesystem>
+
+
+// 텍스처 파일 불러오기
 typedef struct _AUX_RGBImageRec {
     GLint sizeX, sizeY;
     unsigned char* data;
 } AUX_RGBImageRec;
 
 unsigned int MyTextureObject[5];
-AUX_RGBImageRec* pTextureImage[5];  //텍스쳐 저장 공간을 가리키는 포인터
+AUX_RGBImageRec* pTextureImage[5];
 
-// BMP파일을 읽어 AUX_RGBImageRec 구조체에 저장하는 LoadBMP 함수
 AUX_RGBImageRec* LoadBMP(const char* filename) {
     std::ifstream file(filename, std::ios::binary);
     if (!file) {
@@ -73,35 +75,37 @@ AUX_RGBImageRec* LoadBMP(const char* filename) {
     return texture;
 }
 
-int LoadGLTextures(char* szFilePath, int i) {  // 파일 로드 텍스쳐로 변환
-    int Status = FALSE;
+// 텍스처 로드 함수
+int LoadGLTextures(const std::string& directory) {
+    int textureIndex = 0;
 
-    glClearColor(0.0, 0.0, 0.0, 0.5);
-    memset(pTextureImage, 0, sizeof(void*) * 10); // NULL로 초기화
+    // 디렉토리 내 BMP 파일 탐색
+    for (const auto& entry : std::filesystem::directory_iterator(directory)) {
+        if (entry.path().extension() == ".bmp" && textureIndex < 5) {
+            std::string filepath = entry.path().string();
 
-    // 텍스쳐 이미지 로드
-    if (pTextureImage[i] = LoadBMP((char*)szFilePath)) {
-        Status = TRUE;
-        glGenTextures(1, &MyTextureObject[i]);
-        glBindTexture(GL_TEXTURE_2D, MyTextureObject[i]);
-        glTexImage2D(GL_TEXTURE_2D, 0, 3,
-            pTextureImage[i]->sizeX, pTextureImage[i]->sizeY,
-            0, GL_RGB, GL_UNSIGNED_BYTE, pTextureImage[i]->data);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glEnable(GL_TEXTURE_2D);
-    }
+            // 텍스처 이미지 로드
+            AUX_RGBImageRec* texture = LoadBMP(filepath.c_str());
+            if (texture) {
+                glGenTextures(1, &MyTextureObject[textureIndex]);
+                glBindTexture(GL_TEXTURE_2D, MyTextureObject[textureIndex]);
+                glTexImage2D(GL_TEXTURE_2D, 0, 3, texture->sizeX, texture->sizeY, 0, GL_RGB, GL_UNSIGNED_BYTE, texture->data);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    // 메모리 해제
-    if (pTextureImage[i]) {
-        if (pTextureImage[i]->data) {
-            free(pTextureImage[i]->data);
+                // 텍스처 메모리 해제
+                delete[] texture->data;
+                delete texture;
+
+                textureIndex++;
+            }
         }
-        free(pTextureImage[i]);
     }
 
-    return Status;
+    return textureIndex; // 성공적으로 로드된 텍스처 개수 반환
 }
+
+
 
 // 윈도우 크기
 const int window_width = 1920;
@@ -149,21 +153,19 @@ float second = 0.0f;  // 초침
 // 시계 본체
 void CreateClock() {
 
-    // 앞면
-    GLfloat frontMaterial[] = { 1.0f, 1.0f, 1.0f, 1.0f };  // 앞면
+    // 재질 설정
     GLfloat backMaterial[] = { 1.0f, 1.0f, 0.6f, 1.0f };  // 옆뒷면
+    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, defaultMaterial);
 
-    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, frontMaterial);
-
-    // 텍스처 활성화는 입간판 화면을 그리기 직전에
+    // 텍스처 활성화
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, MyTextureObject[0]);
 
-    // 시계 테두리 그리기 (네모난 시계)
+    // 시계 본체
     glTranslatef(0.0f, 0.0f, -1.0f);  // 위치 조정
-    // 직사각형 시계 (가로, 세로 좁고 높이 긴 6면체) 
+
+    // 앞면 
     glBegin(GL_QUADS);
-        // 앞면 
         glTexCoord2f(0.0f, 1.0f); glVertex3f(-0.3f, 0.0f, 0.15f);
         glTexCoord2f(1.0f, 1.0f); glVertex3f(0.3f, 0.0f, 0.15f);
         glTexCoord2f(1.0f, 0.0f); glVertex3f(0.3f, 1.0f, 0.15f);
@@ -172,7 +174,7 @@ void CreateClock() {
 
 
     glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, backMaterial); // 옆 뒤 재질 변경
-    glBindTexture(GL_TEXTURE_2D, MyTextureObject[3]);
+    glBindTexture(GL_TEXTURE_2D, MyTextureObject[4]);
     glBegin(GL_QUADS);
         // 뒷면 
         glTexCoord2f(0.0f, 1.0f); glVertex3f(-0.3f, 0.0f, -0.15f);
@@ -209,15 +211,10 @@ void CreateClock() {
 // 시계 바늘
 void CreateClockHands() {
     // 초침, 분침, 시침의 길이 설정
-    float secondLength = 0.25f;
-    float minuteLength = 0.2f;
-    float hourLength = 0.15f;
-
     GLfloat secondMaterial[] = { 1.0f, 0.0f, 0.0f, 1.0f };
     GLfloat minuteMaterial[] = { 0.0f, 1.0f, 0.0f, 1.0f };
     GLfloat hourMaterial[] = { 0.0f, 0.0f, 1.0f, 1.0f };
     
-
     // 초침
     glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, secondMaterial);
     glPushMatrix();
@@ -226,7 +223,7 @@ void CreateClockHands() {
     glLineWidth(3.0f);  // 초침의 두께를 3으로 설정
     glBegin(GL_LINES);
     glVertex3f(0.0f, 0.0f, 0.0f);
-    glVertex3f(0.0f, secondLength, 0.0f);  // 초침 끝
+    glVertex3f(0.0f, 0.25f, 0.0f);  // 초침 끝
     glEnd();
     glPopMatrix();
 
@@ -238,7 +235,7 @@ void CreateClockHands() {
     glLineWidth(5.0f);  // 분침의 두께를 5로 설정
     glBegin(GL_LINES);
     glVertex3f(0.0f, 0.0f, 0.0f);
-    glVertex3f(0.0f, minuteLength, 0.0f);  // 분침 끝
+    glVertex3f(0.0f, 0.2f, 0.0f);  // 분침 끝
     glEnd();
     glPopMatrix();
 
@@ -250,7 +247,7 @@ void CreateClockHands() {
     glLineWidth(7.0f);  // 시침의 두께를 7로 설정
     glBegin(GL_LINES);
     glVertex3f(0.0f, 0.0f, 0.0f);
-    glVertex3f(0.0f, hourLength, 0.0f);  // 시침 끝
+    glVertex3f(0.0f, 0.15f, 0.0f);  // 시침 끝
     glEnd();
     glPopMatrix();
 
@@ -281,7 +278,7 @@ void CreateWall() {
     glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, defaultMaterial);
 
     glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, MyTextureObject[1]);
+    glBindTexture(GL_TEXTURE_2D, MyTextureObject[3]);
 
     glBegin(GL_QUADS);  // 사각형 면을 그리기 위한 GL_QUADS 사용
 
@@ -291,52 +288,16 @@ void CreateWall() {
     glTexCoord2f(1.0f, 1.0f);  glVertex3f(15, 0, -15);   // 오른쪽 하단
     glTexCoord2f(1.0f, 0.0f);  glVertex3f(15, 0, 15);    // 오른쪽 상단
     glTexCoord2f(0.0f, 0.0f);  glVertex3f(-15, 0, 15);   // 왼쪽 상단
-
-    // 벽의 뒷면
-    glNormal3f(0, -1, 0);  // 법선 벡터 설정 (아래쪽 방향)
-    glTexCoord2f(0.0f, 1.0f);  glVertex3f(-15, 1, -15);  // 왼쪽 상단
-    glTexCoord2f(1.0f, 1.0f);  glVertex3f(15, 1, -15);   // 오른쪽 상단
-    glTexCoord2f(1.0f, 0.0f);  glVertex3f(15, 1, 15);    // 오른쪽 하단
-    glTexCoord2f(0.0f, 0.0f);  glVertex3f(-15, 1, 15);   // 왼쪽 하단
-
-    // 벽의 왼쪽 면
-    glNormal3f(-1, 0, 0);  // 법선 벡터 설정 (왼쪽 방향)
-    glTexCoord2f(0.0f, 1.0f);  glVertex3f(-15, 0, -15);   // 앞면 왼쪽 하단
-    glTexCoord2f(1.0f, 1.0f);  glVertex3f(-15, 1, -15);  // 뒷면 왼쪽 상단
-    glTexCoord2f(1.0f, 0.0f);  glVertex3f(-15, 1, 15);   // 뒷면 왼쪽 하단
-    glTexCoord2f(0.0f, 0.0f);  glVertex3f(-15, 0, 15);    // 앞면 왼쪽 상단
-
-    // 벽의 오른쪽 면
-    glNormal3f(1, 0, 0);   // 법선 벡터 설정 (오른쪽 방향)
-    glTexCoord2f(0.0f, 1.0f);  glVertex3f(15, 0, -15);   // 앞면 오른쪽 하단
-    glTexCoord2f(1.0f, 1.0f);  glVertex3f(15, 1, -15);  // 뒷면 오른쪽 상단
-    glTexCoord2f(1.0f, 0.0f);  glVertex3f(15, 1, 15);   // 뒷면 오른쪽 하단
-    glTexCoord2f(0.0f, 0.0f);  glVertex3f(15, 0, 15);    // 앞면 오른쪽 상단
-
-    // 벽의 윗면
-    glNormal3f(0, 0, -1);   // 법선 벡터 설정 (뒤쪽 방향)
-    glTexCoord2f(0.0f, 1.0f);  glVertex3f(-15, 1, -15);   // 왼쪽 상단
-    glTexCoord2f(1.0f, 1.0f);  glVertex3f(15, 1, -15);    // 오른쪽 상단
-    glTexCoord2f(1.0f, 0.0f);  glVertex3f(15, 1, 15);     // 오른쪽 하단
-    glTexCoord2f(0.0f, 0.0f);  glVertex3f(-15, 1, 15);    // 왼쪽 하단
-
-    // 벽의 아랫면
-    glNormal3f(0, 0, 1);    // 법선 벡터 설정 (앞쪽 방향)
-    glTexCoord2f(0.0f, 1.0f);  glVertex3f(-15, 0, -15);    // 왼쪽 하단
-    glTexCoord2f(1.0f, 1.0f);  glVertex3f(15, 0, -15);     // 오른쪽 하단
-    glTexCoord2f(1.0f, 0.0f);  glVertex3f(15, 0, 15);      // 오른쪽 상단
-    glTexCoord2f(0.0f, 0.0f);  glVertex3f(-15, 0, 15);     // 왼쪽 상단
-
+    
     glEnd();
     glDisable(GL_TEXTURE_2D);
 }
 
 
 void Skybox() {
-    int TEX_SIZE = 3;
+    GLfloat TEX_SIZE = 3;
 
     glEnable(GL_TEXTURE_2D);
-
     glMatrixMode(GL_MODELVIEW);
 
     glPushMatrix();
@@ -344,7 +305,7 @@ void Skybox() {
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
     glColor3f(0, 0, 0);
     
-    glBindTexture(GL_TEXTURE_2D, MyTextureObject[4]);
+    glBindTexture(GL_TEXTURE_2D, MyTextureObject[1]);
 
     glBegin(GL_QUADS);
     glTexCoord2f(0.0, 0.0); glVertex3f(-TEX_SIZE, -TEX_SIZE, -TEX_SIZE);
@@ -353,7 +314,7 @@ void Skybox() {
     glTexCoord2f(0.0, 1.0); glVertex3f(-TEX_SIZE, TEX_SIZE, -TEX_SIZE);
     glEnd();
 
-    glBindTexture(GL_TEXTURE_2D, MyTextureObject[4]);
+    glBindTexture(GL_TEXTURE_2D, MyTextureObject[1]);
     glBegin(GL_QUADS);
     glTexCoord2f(0.0, 0.0); glVertex3f(TEX_SIZE, -TEX_SIZE, TEX_SIZE);
     glTexCoord2f(1.0, 0.0); glVertex3f(-TEX_SIZE, -TEX_SIZE, TEX_SIZE);
@@ -362,7 +323,7 @@ void Skybox() {
     glEnd();
 
     // 좌
-    glBindTexture(GL_TEXTURE_2D, MyTextureObject[4]);
+    glBindTexture(GL_TEXTURE_2D, MyTextureObject[1]);
     glBegin(GL_QUADS);
     glTexCoord2f(0.0, 0.0); glVertex3f(TEX_SIZE, -TEX_SIZE, -TEX_SIZE);
     glTexCoord2f(1.0, 0.0); glVertex3f(TEX_SIZE, -TEX_SIZE, TEX_SIZE);
@@ -371,7 +332,7 @@ void Skybox() {
     glEnd();
 
     // 우
-    glBindTexture(GL_TEXTURE_2D, MyTextureObject[4]);
+    glBindTexture(GL_TEXTURE_2D, MyTextureObject[1]);
     glBegin(GL_QUADS);
     glTexCoord2f(0.0, 0.0); glVertex3f(-TEX_SIZE, -TEX_SIZE, TEX_SIZE);
     glTexCoord2f(1.0, 0.0); glVertex3f(-TEX_SIZE, -TEX_SIZE, -TEX_SIZE);
@@ -380,7 +341,7 @@ void Skybox() {
     glEnd();
 
     // 위
-    glBindTexture(GL_TEXTURE_2D, MyTextureObject[4]);
+    glBindTexture(GL_TEXTURE_2D, MyTextureObject[1]);
     glBegin(GL_QUADS);
     glTexCoord2f(0.0, 0.0); glVertex3f(-TEX_SIZE, TEX_SIZE, -TEX_SIZE);
     glTexCoord2f(1.0, 0.0); glVertex3f(TEX_SIZE, TEX_SIZE, -TEX_SIZE);
@@ -389,7 +350,7 @@ void Skybox() {
     glEnd();
 
     // 아래
-    glBindTexture(GL_TEXTURE_2D, MyTextureObject[4]);
+    glBindTexture(GL_TEXTURE_2D, MyTextureObject[1]);
     glBegin(GL_QUADS);
     glTexCoord2f(0.0, 0.0); glVertex3f(-TEX_SIZE, -TEX_SIZE, TEX_SIZE);
     glTexCoord2f(1.0, 0.0); glVertex3f(TEX_SIZE, -TEX_SIZE, TEX_SIZE);
@@ -658,53 +619,48 @@ void idle() {
 
 int main(int argc, char** argv) {
 
-    if (argc <= 1) {
-        printf("\n%s\n\n", "Usage : TextureDLG3_Consol.exe [BMPFileName.bmp]");
-        exit(1);
-    }
-    else {
-        // GLUT 초기화
-        glutInit(&argc, argv);
-        glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-        glutInitWindowSize(window_width, window_height);
-        glutCreateWindow("컴퓨터 그래픽스 기말 과제 프로젝트 2) 시계");
 
-        // 마우스 숨기기
-        glutSetCursor(GLUT_CURSOR_NONE);
+    // GLUT 초기화
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+    glutInitWindowSize(window_width, window_height);
+    glutCreateWindow("컴퓨터 그래픽스 기말 과제 프로젝트 2) 시계");
 
-        // 각 BMP 파일을 텍스처로 로드
-        for (int i = 1; i < argc; i++) {
-            if (LoadGLTextures(argv[i], i - 1)) {
-                glEnable(GL_TEXTURE_2D);
-            }
-            else {
-                printf("Texture loading failed for %s\n", argv[i]);
-                exit(1);
-            }
-        }
+    // 마우스 숨기기
+    glutSetCursor(GLUT_CURSOR_NONE);
 
-        // OpenGL 초기화
-        initLight();
 
-        glEnable(GL_TEXTURE_2D);
-        glShadeModel(GL_SMOOTH);
-        glClearDepth(1.0);
-        glEnable(GL_DEPTH_TEST);
-        glDepthFunc(GL_LEQUAL);
-        glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+    /*
+        실행 파일이 있는 경로로 텍스처 로드
+        기존에 명령 인수에 넣고 로드하였으나, exe파일로 실행 시 명령 인수가 실행이 안됨 (argc값이 안나옴)
+        현재 폴더에 있는 bmp파일을 불러와서 텍스처로 사용
+    */
+    std::string exeDirectory = std::filesystem::current_path().string();
+    int loadedTextures = LoadGLTextures(exeDirectory);
+
+    // OpenGL 초기화
+    initLight();
+
+    glEnable(GL_TEXTURE_2D);
+    glShadeModel(GL_SMOOTH);
+    glClearDepth(1.0);
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LEQUAL);
+    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
 
 
-        // 콜백 함수 등록
-        glutDisplayFunc(MyDisplay);
-        glutReshapeFunc(MyReshape);
-        glutKeyboardFunc(MyKeyboard); // 키보드 입력 시
-        glutKeyboardUpFunc(MyKeyboardUp); // 키보드 땠을 때
-        glutPassiveMotionFunc(MyMouseMove);  // 마우스
-        glutIdleFunc(idle);
+    // 콜백 함수 등록
+    glutDisplayFunc(MyDisplay);
+    glutReshapeFunc(MyReshape);
+    glutKeyboardFunc(MyKeyboard); // 키보드 입력 시
+    glutKeyboardUpFunc(MyKeyboardUp); // 키보드 땠을 때
+    glutPassiveMotionFunc(MyMouseMove);  // 마우스
+    glutIdleFunc(idle);
 
-        glutMainLoop();
+    glutMainLoop();
 
-    }
+    
+
 }
 
