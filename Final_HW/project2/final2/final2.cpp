@@ -134,7 +134,7 @@ bool keys[256] = { false };
 bool W = false, A = false, S = false, D = false;
 
 // 이동 관련 변수
-const float moveSpeed = 0.01f;
+const float moveSpeed = 0.1f;
 
 // 파이
 const float PI = 3.14;
@@ -251,9 +251,7 @@ void CreateClockHands() {
     glEnd();
     glPopMatrix();
 
-
-
-    second += 0.01f;  // 초침 1초당 1도씩
+    second += 1.0f;  // 시간 상 빠르게 회전하기 위해 보정
 
     // 초침이 60초가 되면
     if (second >= 60.0f) {
@@ -617,6 +615,14 @@ void idle() {
     MyCamera();
 }
 
+// 콜백 함수: 타이머
+void timer(int value) {
+    MyCamera();
+    glutPostRedisplay();
+    glutTimerFunc(16, timer, 0);    // 16ms마다 timer 호출
+}
+
+
 int main(int argc, char** argv) {
 
 
@@ -656,7 +662,8 @@ int main(int argc, char** argv) {
     glutKeyboardFunc(MyKeyboard); // 키보드 입력 시
     glutKeyboardUpFunc(MyKeyboardUp); // 키보드 땠을 때
     glutPassiveMotionFunc(MyMouseMove);  // 마우스
-    glutIdleFunc(idle);
+    //glutIdleFunc(idle);
+    glutTimerFunc(16, timer, 0); // 16ms 간격으로 timer 호출
 
     glutMainLoop();
 
