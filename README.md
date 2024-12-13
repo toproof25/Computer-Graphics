@@ -31,7 +31,7 @@
 <br/>
 ### 설정 사항 -> 비쥬얼 스튜디오 2022 프로젝트 속성 -> C/C++ -> 언어 -> **C++17 표준** 변경
 
-<img src="https://github.com/user-attachments/assets/b5c46932-18d3-481f-9550-672031be9330" width="500" height="500" />
+<img src="https://github.com/user-attachments/assets/b5c46932-18d3-481f-9550-672031be9330" width="500" />
 
 
 ### 4-1. 공원 장면들 - 문제1번 
