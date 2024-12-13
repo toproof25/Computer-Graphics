@@ -34,18 +34,8 @@
 ### 4-1. 공원 장면들 - 문제1번 
 - - [공원 장면들](Final_HW/project1/final1)
   
-### 4-2. 다양한 시계 - 문제2번 
+### 4-2. 시계 - 문제2번 
 - - [다양한 시계](Final_HW/project2/final2)
-  
-### 4-3. 생활 주변 장면들 - 문제3번 
-- - [생활 주변 장면들](Final_HW/project3/final3)
- 
-### 4-4. FPS - 문제4번 
-- - [FPS](Final_HW/project4/final4)
-
-### 4-5. 비행 시뮬레이션 - 문제5번 
-- - [비행 시뮬레이션](Final_HW/project5/final5)
-
 
 
 
