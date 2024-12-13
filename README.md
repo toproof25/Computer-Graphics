@@ -25,7 +25,7 @@
 <br/>
 
 ---
-# 발표한 과제 주제 - [2번 다양한 시계](Final_HW/project2/final2)
+# 발표한 과제 주제 - [2번 다양한 시계 Final_HW/project2/final2](Final_HW/project2/final2)
 ### [기말 프로젝트 실행 파일 모음](Final_HW/exe_file)
 
 <br/>
