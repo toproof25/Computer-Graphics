@@ -20,8 +20,8 @@ typedef struct _AUX_RGBImageRec {
     unsigned char* data;
 } AUX_RGBImageRec;
 
-unsigned int MyTextureObject[5];
-AUX_RGBImageRec* pTextureImage[5];
+unsigned int MyTextureObject[6];
+AUX_RGBImageRec* pTextureImage[6];
 
 AUX_RGBImageRec* LoadBMP(const char* filename) {
     std::ifstream file(filename, std::ios::binary);
@@ -81,7 +81,7 @@ int LoadGLTextures(const std::string& directory) {
 
     // 디렉토리 내 BMP 파일 탐색
     for (const auto& entry : std::filesystem::directory_iterator(directory)) {
-        if (entry.path().extension() == ".bmp" && textureIndex < 5) {
+        if (entry.path().extension() == ".bmp" && textureIndex < 15) {
             std::string filepath = entry.path().string();
 
             // 텍스처 이미지 로드
@@ -365,6 +365,40 @@ void Skybox() {
 }
 
 
+
+void CreateStreetLamp() {
+
+    // 텍스처 활성화
+    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, defaultMaterial);
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, MyTextureObject[5]);
+    GLUquadric* quad = gluNewQuadric();
+    gluQuadricTexture(quad, GL_TRUE);  // 원기둥 텍스처 매핑
+
+    glPushMatrix();
+    glTranslatef(0, 0, 0); // 원점에서 시작
+    glRotatef(-90, 1, 0, 0); // X축 기준 90도 회전
+    gluCylinder(quad, 0.1, 0.1, 5.0, 32, 32); // 밑면 반지름 0.5, 윗면 반지름 0.5, 높이 5
+    glPopMatrix();
+    gluDeleteQuadric(quad);
+
+    glPushMatrix();
+    glTranslatef(1, 5, 0); // 기둥 위쪽 끝으로 이동
+    glRotatef(90, 1, 0, 0); // X축 기준 90도 회전
+
+    glBegin(GL_QUADS);
+    glNormal3f(0, 0, 1);
+    glVertex3f(-1, -0.1, 0); // 직사각형 한 면의 네 점 정의
+    glVertex3f(1, -0.1, 0);
+    glVertex3f(1, 0.1, 0);
+    glVertex3f(-1, 0.1, 0);
+    glEnd();
+
+    glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
+}
+
+
 // 디스플레이
 void MyDisplay() {
 
@@ -384,6 +418,24 @@ void MyDisplay() {
         0.0, 1.0, 0.0                                       // 위쪽 방향
     );
 
+
+    // 가로등
+    for (int i = 0; i < 5; ++i) {
+        glPushMatrix();
+        glTranslatef(-3, 0, i * 3); // X, Z 위치로 이동
+        //glRotatef(-95, 0, 1, 0);
+        CreateStreetLamp();
+        glPopMatrix();
+    }
+
+    // 가로등
+    for (int i = 0; i < 5; ++i) {
+        glPushMatrix();
+        glTranslatef(3, 0, i * 3); // X, Z 위치로 이동
+        glRotatef(180, 0, 1, 0);
+        CreateStreetLamp();
+        glPopMatrix();
+    }
 
     // 시계 렌더링
     glPushMatrix();
@@ -477,6 +529,8 @@ void CreateText(float x, float y, float z, void* font, const std::string& text) 
         glutBitmapCharacter(font, c);
     }
 }
+
+
 
 // 윈도우 크기 변경 콜백 함수
 void MyReshape(int w, int h) {
