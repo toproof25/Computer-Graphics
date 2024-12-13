@@ -1,4 +1,4 @@
-#include <GL/glut.h>
+ï»¿#include <GL/glut.h>
 #include <GL/glu.h>
 #include <GL/gl.h>
 
@@ -7,14 +7,13 @@
 #include <iostream>
 
 #include <stdio.h>
-#include <iostream>
 #include <fstream>
 #include <vector>
 
 #include <filesystem>
 
 
-// ÅØ½ºÃ³ ÆÄÀÏ ºÒ·¯¿À±â
+// í…ìŠ¤ì²˜ íŒŒì¼ ë¶ˆëŸ¬ì˜¤ê¸°
 typedef struct _AUX_RGBImageRec {
     GLint sizeX, sizeY;
     unsigned char* data;
@@ -75,16 +74,16 @@ AUX_RGBImageRec* LoadBMP(const char* filename) {
     return texture;
 }
 
-// ÅØ½ºÃ³ ·Îµå ÇÔ¼ö
+// í…ìŠ¤ì²˜ ë¡œë“œ í•¨ìˆ˜
 int LoadGLTextures(const std::string& directory) {
     int textureIndex = 0;
 
-    // µğ·ºÅä¸® ³» BMP ÆÄÀÏ Å½»ö
+    // ë””ë ‰í† ë¦¬ ë‚´ BMP íŒŒì¼ íƒìƒ‰
     for (const auto& entry : std::filesystem::directory_iterator(directory)) {
         if (entry.path().extension() == ".bmp" && textureIndex < 5) {
             std::string filepath = entry.path().string();
 
-            // ÅØ½ºÃ³ ÀÌ¹ÌÁö ·Îµå
+            // í…ìŠ¤ì²˜ ì´ë¯¸ì§€ ë¡œë“œ
             AUX_RGBImageRec* texture = LoadBMP(filepath.c_str());
             if (texture) {
                 glGenTextures(1, &MyTextureObject[textureIndex]);
@@ -93,7 +92,7 @@ int LoadGLTextures(const std::string& directory) {
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-                // ÅØ½ºÃ³ ¸Ş¸ğ¸® ÇØÁ¦
+                // í…ìŠ¤ì²˜ ë©”ëª¨ë¦¬ í•´ì œ
                 delete[] texture->data;
                 delete texture;
 
@@ -102,81 +101,69 @@ int LoadGLTextures(const std::string& directory) {
         }
     }
 
-    return textureIndex; // ¼º°øÀûÀ¸·Î ·ÎµåµÈ ÅØ½ºÃ³ °³¼ö ¹İÈ¯
+    return textureIndex; // ì„±ê³µì ìœ¼ë¡œ ë¡œë“œëœ í…ìŠ¤ì²˜ ê°œìˆ˜ ë°˜í™˜
 }
 
 
 
-// À©µµ¿ì Å©±â
-const int window_width = 1920;
-const int window_height = 1080;
+// ìœˆë„ìš° í¬ê¸°
+const int window_width = 800;
+const int window_height = 600;
 
-// µµ¿ò¸» Åä±Û
+// ë„ì›€ë§ í† ê¸€
 bool help = true;
 
-// Ä«¸Ş¶ó À§Ä¡, ¹æÇâ
+// ì¹´ë©”ë¼ ìœ„ì¹˜, ë°©í–¥
 float cameraX = 0.0f;
 float cameraY = 1.0f;
 float cameraZ = 5.0f;
-float cameraYaw = 0.0f;    // ¼öÆò È¸Àü
-float cameraPitch = 0.0f;  // ¼öÁ÷ È¸Àü
+float cameraYaw = 0.0f;    // ìˆ˜í‰ íšŒì „
+float cameraPitch = 0.0f;  // ìˆ˜ì§ íšŒì „
 
-// ¸¶¿ì½º °ü·Ã º¯¼ö
-int lastX = window_width / 2;  // À©µµ¿ì Áß¾ÓÀ» 0À¸·Î
+// ë§ˆìš°ìŠ¤ ê´€ë ¨ ë³€ìˆ˜
+int lastX = window_width / 2;  // ìœˆë„ìš° ì¤‘ì•™ì„ 0ìœ¼ë¡œ
 int lastY = window_height / 2;
 
-bool firstMoveMouse = true; // Ã³À½ ¿òÁ÷ÀÏ ¶§ lastX, lastYÀ» ÀúÀåÇÏ±â À§ÇØ
+bool firstMoveMouse = true; // ì²˜ìŒ ì›€ì§ì¼ ë•Œ lastX, lastYì„ ì €ì¥í•˜ê¸° ìœ„í•´
 
-const float mouseSpeed = 0.005f; //   ¸¶¿ì½º ¼Óµµ
+const float mouseSpeed = 0.005f; //   ë§ˆìš°ìŠ¤ ì†ë„
 
-// Å° »óÅÂ - Å°¿¡ ¸ğµç ¹è¿­À» false·Î ÃÊ±âÈ­ -> W, A, S, D Å°¿¡ ´ëÇØ¼­ true·Î ¼³Á¤
+// í‚¤ ìƒíƒœ - í‚¤ì— ëª¨ë“  ë°°ì—´ì„ falseë¡œ ì´ˆê¸°í™” -> W, A, S, D í‚¤ì— ëŒ€í•´ì„œ trueë¡œ ì„¤ì •
 bool keys[256] = { false };
 bool W = false, A = false, S = false, D = false;
 
-// ÀÌµ¿ °ü·Ã º¯¼ö
-const float moveSpeed = 0.001f;
+// ì´ë™ ê´€ë ¨ ë³€ìˆ˜
+const float moveSpeed = 0.1f;
 
-// ÆÄÀÌ
+// íŒŒì´
 const float PI = 3.14;
 
 //********************************************************************************************************************
 
 void CreateText(float x, float y, float z, void* font, const std::string& text);
 
-GLfloat defaultMaterial[] = { 1.0f, 1.0f, 1.0f, 1.0f };  // ±âº» °ª
+GLfloat defaultMaterial[] = { 1.0f, 1.0f, 1.0f, 1.0f };  // ê¸°ë³¸ ê°’
 
-// ½Ã°£ °ü·Ã º¯¼ö
-float hour = 0.0f;  // ½ÃÄ§
-float minute = 0.0f;  // ºĞÄ§
-float second = 0.0f;  // ÃÊÄ§
+// ì‹œê°„ ê´€ë ¨ ë³€ìˆ˜
+float hour = 0.0f;  // ì‹œì¹¨
+float minute = 0.0f;  // ë¶„ì¹¨
+float second = 0.0f;  // ì´ˆì¹¨
 
-
-// Å¸°Ù ¹× ÆÄÆ¼Å¬ ½Ã½ºÅÛ °ü·Ã º¯¼ö
-struct Particle {
-    float x, y, z; // À§Ä¡
-    float velocityX, velocityY, velocityZ; // ¼Óµµ
-    float life; // ¼ö¸í
-    float color[4]; // »ö»ó (RGBA)
-};
-
-std::vector<Particle> particles;
-bool shooting = false;
-
-// ½Ã°è º»Ã¼
+// ì‹œê³„ ë³¸ì²´
 void CreateClock() {
 
-    // ÀçÁú ¼³Á¤
-    GLfloat backMaterial[] = { 1.0f, 1.0f, 0.6f, 1.0f };  // ¿·µŞ¸é
+    // ì¬ì§ˆ ì„¤ì •
+    GLfloat backMaterial[] = { 1.0f, 1.0f, 0.6f, 1.0f };  // ì˜†ë’·ë©´
     glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, defaultMaterial);
 
-    // ÅØ½ºÃ³ È°¼ºÈ­
+    // í…ìŠ¤ì²˜ í™œì„±í™”
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, MyTextureObject[0]);
 
-    // ½Ã°è º»Ã¼
-    glTranslatef(0.0f, 0.0f, -1.0f);  // À§Ä¡ Á¶Á¤
+    // ì‹œê³„ ë³¸ì²´
+    glTranslatef(0.0f, 0.0f, -1.0f);  // ìœ„ì¹˜ ì¡°ì •
 
-    // ¾Õ¸é 
+    // ì•ë©´ 
     glBegin(GL_QUADS);
     glTexCoord2f(0.0f, 1.0f); glVertex3f(-0.3f, 0.0f, 0.15f);
     glTexCoord2f(1.0f, 1.0f); glVertex3f(0.3f, 0.0f, 0.15f);
@@ -185,34 +172,34 @@ void CreateClock() {
     glEnd();
 
 
-    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, backMaterial); // ¿· µÚ ÀçÁú º¯°æ
+    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, backMaterial); // ì˜† ë’¤ ì¬ì§ˆ ë³€ê²½
     glBindTexture(GL_TEXTURE_2D, MyTextureObject[4]);
     glBegin(GL_QUADS);
-    // µŞ¸é 
+    // ë’·ë©´ 
     glTexCoord2f(0.0f, 1.0f); glVertex3f(-0.3f, 0.0f, -0.15f);
     glTexCoord2f(1.0f, 1.0f); glVertex3f(0.3f, 0.0f, -0.15f);
     glTexCoord2f(1.0f, 0.0f); glVertex3f(0.3f, 1.0f, -0.15f);
     glTexCoord2f(0.0f, 0.0f); glVertex3f(-0.3f, 1.0f, -0.15f);
 
-    // ¿ŞÂÊ ¸é 
+    // ì™¼ìª½ ë©´ 
     glTexCoord2f(0.0f, 1.0f); glVertex3f(-0.3f, 0.0f, -0.15f);
     glTexCoord2f(1.0f, 1.0f); glVertex3f(-0.3f, 0.0f, 0.15f);
     glTexCoord2f(1.0f, 0.0f); glVertex3f(-0.3f, 1.0f, 0.15f);
     glTexCoord2f(0.0f, 0.0f); glVertex3f(-0.3f, 1.0f, -0.15f);
 
-    // ¿À¸¥ÂÊ ¸é 
+    // ì˜¤ë¥¸ìª½ ë©´ 
     glTexCoord2f(0.0f, 1.0f); glVertex3f(0.3f, 0.0f, -0.15f);
     glTexCoord2f(1.0f, 1.0f); glVertex3f(0.3f, 0.0f, 0.15f);
     glTexCoord2f(1.0f, 0.0f); glVertex3f(0.3f, 1.0f, 0.15f);
     glTexCoord2f(0.0f, 0.0f); glVertex3f(0.3f, 1.0f, -0.15f);
 
-    // À­¸é 
+    // ìœ—ë©´ 
     glTexCoord2f(0.0f, 1.0f); glVertex3f(-0.3f, 1.0f, 0.15f);
     glTexCoord2f(1.0f, 1.0f); glVertex3f(0.3f, 1.0f, 0.15f);
     glTexCoord2f(1.0f, 0.0f); glVertex3f(0.3f, 1.0f, -0.15f);
     glTexCoord2f(0.0f, 0.0f); glVertex3f(-0.3f, 1.0f, -0.15f);
 
-    // ¾Æ·§¸é 
+    // ì•„ë«ë©´ 
     glTexCoord2f(0.0f, 1.0f); glVertex3f(-0.3f, 0.0f, 0.15f);
     glTexCoord2f(1.0f, 1.0f); glVertex3f(0.3f, 0.0f, 0.15f);
     glTexCoord2f(1.0f, 0.0f); glVertex3f(0.3f, 0.0f, -0.15f);
@@ -220,62 +207,60 @@ void CreateClock() {
     glEnd();
 }
 
-// ½Ã°è ¹Ù´Ã
+// ì‹œê³„ ë°”ëŠ˜
 void CreateClockHands() {
-    // ÃÊÄ§, ºĞÄ§, ½ÃÄ§ÀÇ ±æÀÌ ¼³Á¤
+    // ì´ˆì¹¨, ë¶„ì¹¨, ì‹œì¹¨ì˜ ê¸¸ì´ ì„¤ì •
     GLfloat secondMaterial[] = { 1.0f, 0.0f, 0.0f, 1.0f };
     GLfloat minuteMaterial[] = { 0.0f, 1.0f, 0.0f, 1.0f };
     GLfloat hourMaterial[] = { 0.0f, 0.0f, 1.0f, 1.0f };
 
-    // ÃÊÄ§
+    // ì´ˆì¹¨
     glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, secondMaterial);
     glPushMatrix();
-    glRotatef(second * 6.0f, 0.0f, 0.0f, 1.0f);  // ÃÊÄ§Àº 6µµ¾¿ È¸Àü
+    glRotatef(second * 6.0f, 0.0f, 0.0f, 1.0f);  // ì´ˆì¹¨ì€ 6ë„ì”© íšŒì „
 
-    glLineWidth(3.0f);  // ÃÊÄ§ÀÇ µÎ²²¸¦ 3À¸·Î ¼³Á¤
+    glLineWidth(3.0f);  // ì´ˆì¹¨ì˜ ë‘ê»˜ë¥¼ 3ìœ¼ë¡œ ì„¤ì •
     glBegin(GL_LINES);
     glVertex3f(0.0f, 0.0f, 0.0f);
-    glVertex3f(0.0f, 0.25f, 0.0f);  // ÃÊÄ§ ³¡
+    glVertex3f(0.0f, 0.25f, 0.0f);  // ì´ˆì¹¨ ë
     glEnd();
     glPopMatrix();
 
-    // ºĞÄ§
+    // ë¶„ì¹¨
     glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, minuteMaterial);
     glPushMatrix();
-    glRotatef(minute * 6.0f, 0.0f, 0.0f, 1.0f);  // ºĞÄ§Àº 6µµ¾¿ È¸Àü
+    glRotatef(minute * 6.0f, 0.0f, 0.0f, 1.0f);  // ë¶„ì¹¨ì€ 6ë„ì”© íšŒì „
 
-    glLineWidth(5.0f);  // ºĞÄ§ÀÇ µÎ²²¸¦ 5·Î ¼³Á¤
+    glLineWidth(5.0f);  // ë¶„ì¹¨ì˜ ë‘ê»˜ë¥¼ 5ë¡œ ì„¤ì •
     glBegin(GL_LINES);
     glVertex3f(0.0f, 0.0f, 0.0f);
-    glVertex3f(0.0f, 0.2f, 0.0f);  // ºĞÄ§ ³¡
+    glVertex3f(0.0f, 0.2f, 0.0f);  // ë¶„ì¹¨ ë
     glEnd();
     glPopMatrix();
 
-    // ½ÃÄ§
+    // ì‹œì¹¨
     glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, hourMaterial);
     glPushMatrix();
-    glRotatef(hour * 30.0f, 0.0f, 0.0f, 1.0f);  // ½ÃÄ§Àº 30µµ¾¿ È¸Àü
+    glRotatef(hour * 30.0f, 0.0f, 0.0f, 1.0f);  // ì‹œì¹¨ì€ 30ë„ì”© íšŒì „
 
-    glLineWidth(7.0f);  // ½ÃÄ§ÀÇ µÎ²²¸¦ 7·Î ¼³Á¤
+    glLineWidth(7.0f);  // ì‹œì¹¨ì˜ ë‘ê»˜ë¥¼ 7ë¡œ ì„¤ì •
     glBegin(GL_LINES);
     glVertex3f(0.0f, 0.0f, 0.0f);
-    glVertex3f(0.0f, 0.15f, 0.0f);  // ½ÃÄ§ ³¡
+    glVertex3f(0.0f, 0.15f, 0.0f);  // ì‹œì¹¨ ë
     glEnd();
     glPopMatrix();
 
+    second += 1.0f;  // ì‹œê°„ ìƒ ë¹ ë¥´ê²Œ íšŒì „í•˜ê¸° ìœ„í•´ ë³´ì •
 
-
-    second += 0.01f;  // ÃÊÄ§ 1ÃÊ´ç 1µµ¾¿
-
-    // ÃÊÄ§ÀÌ 60ÃÊ°¡ µÇ¸é
+    // ì´ˆì¹¨ì´ 60ì´ˆê°€ ë˜ë©´
     if (second >= 60.0f) {
         second = 0.0f;
-        minute += 1.0f;  // ºĞÄ§ ÇÑ ¹ø È¸Àü
+        minute += 1.0f;  // ë¶„ì¹¨ í•œ ë²ˆ íšŒì „
 
-        // ºĞÄ§ÀÌ 60ºĞÀÌ µÇ¸é
+        // ë¶„ì¹¨ì´ 60ë¶„ì´ ë˜ë©´
         if (minute >= 60.0f) {
             minute = 0.0f;
-            hour += 1.0f;  // ½ÃÄ§ ÇÑ ¹ø È¸Àü
+            hour += 1.0f;  // ì‹œì¹¨ í•œ ë²ˆ íšŒì „
 
             if (hour >= 12.0f) {
                 hour = 0.0f;
@@ -284,7 +269,7 @@ void CreateClockHands() {
     }
 }
 
-// º®
+// ë²½
 void CreateWall() {
 
     glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, defaultMaterial);
@@ -292,14 +277,14 @@ void CreateWall() {
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, MyTextureObject[3]);
 
-    glBegin(GL_QUADS);  // »ç°¢Çü ¸éÀ» ±×¸®±â À§ÇÑ GL_QUADS »ç¿ë
+    glBegin(GL_QUADS);  // ì‚¬ê°í˜• ë©´ì„ ê·¸ë¦¬ê¸° ìœ„í•œ GL_QUADS ì‚¬ìš©
 
-    // º®ÀÇ ¾Õ¸é
-    glNormal3f(0, 1, 0);  // ¹ı¼± º¤ÅÍ ¼³Á¤ (À§ÂÊ ¹æÇâ)
-    glTexCoord2f(0.0f, 1.0f);  glVertex3f(-15, 0, -15);  // ¿ŞÂÊ ÇÏ´Ü
-    glTexCoord2f(1.0f, 1.0f);  glVertex3f(15, 0, -15);   // ¿À¸¥ÂÊ ÇÏ´Ü
-    glTexCoord2f(1.0f, 0.0f);  glVertex3f(15, 0, 15);    // ¿À¸¥ÂÊ »ó´Ü
-    glTexCoord2f(0.0f, 0.0f);  glVertex3f(-15, 0, 15);   // ¿ŞÂÊ »ó´Ü
+    // ë²½ì˜ ì•ë©´
+    glNormal3f(0, 1, 0);  // ë²•ì„  ë²¡í„° ì„¤ì • (ìœ„ìª½ ë°©í–¥)
+    glTexCoord2f(0.0f, 1.0f);  glVertex3f(-15, 0, -15);  // ì™¼ìª½ í•˜ë‹¨
+    glTexCoord2f(1.0f, 1.0f);  glVertex3f(15, 0, -15);   // ì˜¤ë¥¸ìª½ í•˜ë‹¨
+    glTexCoord2f(1.0f, 0.0f);  glVertex3f(15, 0, 15);    // ì˜¤ë¥¸ìª½ ìƒë‹¨
+    glTexCoord2f(0.0f, 0.0f);  glVertex3f(-15, 0, 15);   // ì™¼ìª½ ìƒë‹¨
 
     glEnd();
     glDisable(GL_TEXTURE_2D);
@@ -334,7 +319,7 @@ void Skybox() {
     glTexCoord2f(0.0, 1.0); glVertex3f(TEX_SIZE, TEX_SIZE, TEX_SIZE);
     glEnd();
 
-    // ÁÂ
+    // ì¢Œ
     glBindTexture(GL_TEXTURE_2D, MyTextureObject[1]);
     glBegin(GL_QUADS);
     glTexCoord2f(0.0, 0.0); glVertex3f(TEX_SIZE, -TEX_SIZE, -TEX_SIZE);
@@ -343,7 +328,7 @@ void Skybox() {
     glTexCoord2f(0.0, 1.0); glVertex3f(TEX_SIZE, TEX_SIZE, -TEX_SIZE);
     glEnd();
 
-    // ¿ì
+    // ìš°
     glBindTexture(GL_TEXTURE_2D, MyTextureObject[1]);
     glBegin(GL_QUADS);
     glTexCoord2f(0.0, 0.0); glVertex3f(-TEX_SIZE, -TEX_SIZE, TEX_SIZE);
@@ -352,7 +337,7 @@ void Skybox() {
     glTexCoord2f(0.0, 1.0); glVertex3f(-TEX_SIZE, TEX_SIZE, TEX_SIZE);
     glEnd();
 
-    // À§
+    // ìœ„
     glBindTexture(GL_TEXTURE_2D, MyTextureObject[1]);
     glBegin(GL_QUADS);
     glTexCoord2f(0.0, 0.0); glVertex3f(-TEX_SIZE, TEX_SIZE, -TEX_SIZE);
@@ -361,7 +346,7 @@ void Skybox() {
     glTexCoord2f(0.0, 1.0); glVertex3f(-TEX_SIZE, TEX_SIZE, TEX_SIZE);
     glEnd();
 
-    // ¾Æ·¡
+    // ì•„ë˜
     glBindTexture(GL_TEXTURE_2D, MyTextureObject[1]);
     glBegin(GL_QUADS);
     glTexCoord2f(0.0, 0.0); glVertex3f(-TEX_SIZE, -TEX_SIZE, TEX_SIZE);
@@ -375,82 +360,82 @@ void Skybox() {
     glEnable(GL_DEPTH_TEST);
     glPopMatrix();
     glDisable(GL_TEXTURE_2D);
-    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);  // ÅØ½ºÃ³ È¯°æ ÃÊ±âÈ­
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);  // í…ìŠ¤ì²˜ í™˜ê²½ ì´ˆê¸°í™”
+}
+void renderTable() {
+    glPushMatrix();
+    glColor3f(0.6f, 0.4f, 0.2f);  // Wood brown color
+
+    // Table Top (Main Surface Cuboid)
+    glPushMatrix();
+    glTranslatef(0.0f, 2.0f, 0.0f);
+    glScalef(6.0f, 0.3f, 4.0f);
+    glutSolidCube(1.0);
+    glPopMatrix();
+
+    // Leg 1 - Front Left
+    glPushMatrix();
+    glTranslatef(-2.5f, 1.0f, -1.5f);
+    glScalef(0.3f, 2.0f, 0.3f);
+    glutSolidCube(1.0);
+    glPopMatrix();
+
+    // Leg 2 - Front Right
+    glPushMatrix();
+    glTranslatef(2.5f, 1.0f, -1.5f);
+    glScalef(0.3f, 2.0f, 0.3f);
+    glutSolidCube(1.0);
+    glPopMatrix();
+
+    // Leg 3 - Back Left
+    glPushMatrix();
+    glTranslatef(-2.5f, 1.0f, 1.5f);
+    glScalef(0.3f, 2.0f, 0.3f);
+    glutSolidCube(1.0);
+    glPopMatrix();
+
+    // Leg 4 - Back Right
+    glPushMatrix();
+    glTranslatef(2.5f, 1.0f, 1.5f);
+    glScalef(0.3f, 2.0f, 0.3f);
+    glutSolidCube(1.0);
+    glPopMatrix();
+
+    // Additional Decorative Side Panels
+    // Side Panel 1 - Front
+    glPushMatrix();
+    glTranslatef(0.0f, 1.0f, -1.8f);
+    glScalef(5.7f, 1.4f, 0.2f);
+    glutSolidCube(1.0);
+    glPopMatrix();
+
+    // Side Panel 2 - Back
+    glPushMatrix();
+    glTranslatef(0.0f, 1.0f, 1.8f);
+    glScalef(5.7f, 1.4f, 0.2f);
+    glutSolidCube(1.0);
+    glPopMatrix();
+
+    // Side Panel 3 - Left
+    glPushMatrix();
+    glTranslatef(-2.8f, 1.0f, 0.0f);
+    glRotatef(90.0f, 0.0f, 1.0f, 0.0f);
+    glScalef(3.6f, 1.4f, 0.2f);
+    glutSolidCube(1.0);
+    glPopMatrix();
+
+    // Side Panel 4 - Right
+    glPushMatrix();
+    glTranslatef(2.8f, 1.0f, 0.0f);
+    glRotatef(90.0f, 0.0f, 1.0f, 0.0f);
+    glScalef(3.6f, 1.4f, 0.2f);
+    glutSolidCube(1.0);
+    glPopMatrix();
+
+    glPopMatrix();
 }
 
-
-// ÆÄÆ¼Å¬ È¿°ú ÃÊ±âÈ­
-void createParticle(float x, float y, float z) {
-    Particle p;
-    p.x = x;
-    p.y = y;
-    p.z = z;
-
-    // Ä«¸Ş¶óÀÇ ¼öÆò È¸Àü yaw¿¡ µû¸¥ ¹æÇâ °è»ê
-    float lookX = sin(cameraYaw);  // ¼öÆò È¸Àü¸¸ °í·Á
-    float lookZ = -cos(cameraYaw); // ¼öÆò È¸Àü¸¸ °í·Á
-
-    // ÆÄÆ¼Å¬ ÃÊ±â ¼Óµµ (Ä«¸Ş¶óÀÇ Á¤¸éÀ¸·Î ¹ß»ç)
-    p.velocityX = lookX * 0.1f;  // ¼Óµµ Á¶Á¤
-    p.velocityY = 0.0f;          // ¼öÁ÷ ÀÌµ¿Àº °íÁ¤
-    p.velocityZ = lookZ * 0.1f;
-
-    // ÆÄÆ¼Å¬ »ı¸í ¼³Á¤
-    p.life = 1.0f;
-    p.color[0] = 1.0f;
-    p.color[1] = 0.0f;
-    p.color[2] = 0.0f;
-    p.color[3] = 1.0f;
-
-    // ÆÄÆ¼Å¬ Ãß°¡
-    particles.push_back(p);
-}
-
-
-// ÆÄÆ¼Å¬ ½Ã½ºÅÛ ¾÷µ¥ÀÌÆ®
-void updateParticles() {
-    for (auto& p : particles) {
-        p.x += p.velocityX * 0.1f;  // ¼Óµµ¿¡ µû¸¥ ÀÌµ¿
-        p.y += p.velocityY * 0.1f;
-        p.z += p.velocityZ * 0.1f;
-        p.life -= 0.001f;  // »ı¸í °¨¼Ò
-        if (p.life < 0) {
-            p.life = 0;
-        }
-        p.color[3] = p.life; // ¾ËÆÄ°ªÀ» ÀÌ¿ëÇØ Á¡Á¡ Åõ¸íÇØÁö°Ô ¼³Á¤
-    }
-    // »ı¸íÀÌ ´Ù µÈ ÆÄÆ¼Å¬ Á¦°Å
-    particles.erase(std::remove_if(particles.begin(), particles.end(),
-        [](const Particle& p) { return p.life <= 0; }), particles.end());
-}
-
-
-// »ç°İ ±¸Çö
-void shoot() {
-    shooting = true;
-    // ÃÑ±¸ÀÇ À§Ä¡¿¡ ÆÄÆ¼Å¬ È¿°ú¸¦ »ı¼º
-    createParticle(cameraX + sin(cameraYaw) * 2.0f, cameraY, cameraZ + cos(cameraYaw) * 2.0f);
-}
-
-// È­¸é¿¡ ÆÄÆ¼Å¬ ·»´õ¸µ
-void renderParticles() {
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    for (auto& p : particles) {
-        glPushMatrix();
-        glTranslatef(p.x, p.y, p.z);  // ÆÄÆ¼Å¬ À§Ä¡·Î ÀÌµ¿
-        glColor4f(p.color[0], p.color[1], p.color[2], p.color[3]);
-        glutSolidSphere(0.1f, 10, 10);  // ÆÄÆ¼Å¬ ·»´õ¸µ
-        glPopMatrix();
-    }
-
-    glDisable(GL_BLEND);
-}
-
-
-
-// µğ½ºÇÃ·¹ÀÌ
+// ë””ìŠ¤í”Œë ˆì´
 void MyDisplay() {
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -458,36 +443,32 @@ void MyDisplay() {
 
     Skybox();
 
-
-    // Ä«¸Ş¶ó ¹æÇâ º¤ÅÍ °è»ê (¼öÆò È¸Àü¸¸ Àû¿ë)
-    float lookX = sin(cameraYaw);  // ¼öÆò È¸Àü¸¸ °í·Á
-    float lookY = 0.0f;            // ¼öÁ÷ È¸ÀüÀº °í·ÁÇÏÁö ¾ÊÀ½
-    float lookZ = -cos(cameraYaw); // ¼öÆò È¸Àü¸¸ °í·Á
+    // ì¹´ë©”ë¼ ë°©í–¥ ë²¡í„° ê³„ì‚°
+    float lookX = sin(cameraYaw) * cos(cameraPitch);
+    float lookY = sin(cameraPitch);
+    float lookZ = -cos(cameraYaw) * cos(cameraPitch);
 
     gluLookAt(
-        cameraX, cameraY, cameraZ,                          // Ä«¸Ş¶ó À§Ä¡
-        cameraX + lookX, cameraY + lookY, cameraZ + lookZ,  // ¹Ù¶óº¸´Â ÁöÁ¡
-        0.0, 1.0, 0.0                                       // À§ÂÊ ¹æÇâ
+        cameraX, cameraY, cameraZ,                          // ì¹´ë©”ë¼ ìœ„ì¹˜
+        cameraX + lookX, cameraY + lookY, cameraZ + lookZ,  // ë°”ë¼ë³´ëŠ” ì§€ì 
+        0.0, 1.0, 0.0                                       // ìœ„ìª½ ë°©í–¥
     );
 
-    // ÆÄÆ¼Å¬ ½Ã½ºÅÛ ¾÷µ¥ÀÌÆ®
-    updateParticles();
 
-    // ÆÄÆ¼Å¬ ·»´õ¸µ
-    renderParticles();
-
-
-    // ½Ã°è ·»´õ¸µ
+    // ì‹œê³„ ë Œë”ë§
     glPushMatrix();
-    glTranslatef(0, 0, 0); // X, Z À§Ä¡·Î ÀÌµ¿
+    glTranslatef(0, 0, 0); // X, Z ìœ„ì¹˜ë¡œ ì´ë™
     CreateClock();
-
-    glTranslatef(0, 0.75, 0.155); // X, Z À§Ä¡·Î ÀÌµ¿
-    glRotatef(180, 0, 1, 0);  // YÃà ±âÁØÀ¸·Î 90µµ È¸Àü
-    CreateClockHands();
     glPopMatrix();
 
-    // º® ·»´õ¸µ
+    // í…Œì´ë¸” ë Œë”ë§
+    glPushMatrix();
+    glTranslatef(3, 0, -3); // X, Z ìœ„ì¹˜ë¡œ ì´ë™
+	glScaled(0.3, 0.3, 0.3);
+    renderTable();
+    glPopMatrix();
+
+    // ë²½ ë Œë”ë§
     glPushMatrix();
     glTranslatef(0, 0, 15);
     glRotatef(90, 1, 0, 0);
@@ -515,7 +496,7 @@ void MyDisplay() {
     glPopMatrix();
 
 
-    // ¹Ù´Ú ·»´õ¸µ
+    // ë°”ë‹¥ ë Œë”ë§
     glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, defaultMaterial);
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, MyTextureObject[2]);
@@ -530,11 +511,11 @@ void MyDisplay() {
     glDisable(GL_TEXTURE_2D);
 
 
-    // µµ¿ò¸» Ãâ·Â
+    // ë„ì›€ë§ ì¶œë ¥
     if (help) {
         GLfloat signboardMaterial[] = { 1.0f, 0.0f, 0.07f, 1.0f };
         glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, signboardMaterial);
-        CreateText(0.0f, 1.5f, 0.0f, GLUT_BITMAP_HELVETICA_18, "Park Scenes");
+        CreateText(0.0f, 1.5f, 0.0f, GLUT_BITMAP_HELVETICA_18, "Clock");
         CreateText(0.0f, 1.4f, 0.0f, GLUT_BITMAP_HELVETICA_18, "Move with W, A, S, D");
         CreateText(0.0f, 1.3f, 0.0f, GLUT_BITMAP_HELVETICA_18, "Rotate with the mouse");
     }
@@ -544,9 +525,9 @@ void MyDisplay() {
     glutSwapBuffers();
 }
 
-// OpenGL ÃÊ±âÈ­ ÇÔ¼ö
+// OpenGL ì´ˆê¸°í™” í•¨ìˆ˜
 void initLight() {
-    GLfloat pointLightPos[] = { 0.0f, 6.0f, 0.0f, 1.0f }; // Á¡±¤¿ø 
+    GLfloat pointLightPos[] = { 0.0f, 6.0f, 0.0f, 1.0f }; // ì ê´‘ì› 
     GLfloat ambientLight[] = { 0.3f, 0.3f, 0.3f, 1.0f };
     GLfloat diffuseLight[] = { 0.5f, 0.5f, 0.5f, 1.0f };
 
@@ -562,7 +543,7 @@ void initLight() {
 
 }
 
-// È­¸é¿¡ ÅØ½ºÆ® Ãâ·Â
+// í™”ë©´ì— í…ìŠ¤íŠ¸ ì¶œë ¥
 void CreateText(float x, float y, float z, void* font, const std::string& text) {
     glRasterPos3f(x, y, z);
     for (char c : text) {
@@ -570,7 +551,7 @@ void CreateText(float x, float y, float z, void* font, const std::string& text) 
     }
 }
 
-// À©µµ¿ì Å©±â º¯°æ Äİ¹é ÇÔ¼ö
+// ìœˆë„ìš° í¬ê¸° ë³€ê²½ ì½œë°± í•¨ìˆ˜
 void MyReshape(int w, int h) {
     glViewport(0, 0, w, h);
     glMatrixMode(GL_PROJECTION);
@@ -579,29 +560,29 @@ void MyReshape(int w, int h) {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    // ¸¶¿ì½º À§Ä¡ Áß¾ÓÀ¸·Î ÃÊ±âÈ­
+    // ë§ˆìš°ìŠ¤ ìœ„ì¹˜ ì¤‘ì•™ìœ¼ë¡œ ì´ˆê¸°í™”
     lastX = w / 2;
     lastY = h / 2;
     glutWarpPointer(lastX, lastY);
 }
 
-// ÀÌµ¿, µµ¿ò¸», Á¾·á - Å°º¸µå ÀÔ·Â Äİ¹é ÇÔ¼ö
+// ì´ë™, ë„ì›€ë§, ì¢…ë£Œ - í‚¤ë³´ë“œ ì…ë ¥ ì½œë°± í•¨ìˆ˜
 void MyKeyboard(unsigned char key, int x, int y) {
 
     switch (key)
     {
-        // Á¾·á
+        // ì¢…ë£Œ
     case 'q': case'Q': case '\033':
         exit(0);
         break;
 
-        // µµ¿ò¸» Åä±Û
+        // ë„ì›€ë§ í† ê¸€
     case 'h': case'H':
         help = !help;
         break;
 
 
-        // ÀÌµ¿
+        // ì´ë™
     case 'w': case'W':
         W = true;
         break;
@@ -616,16 +597,12 @@ void MyKeyboard(unsigned char key, int x, int y) {
 
     case 'd': case'D':
         D = true;
-        break; 
-
-    case ' ':
-        shoot(); // ½ºÆäÀÌ½º¹Ù·Î »ç°İ
         break;
     }
 
 }
 
-// ÀÌµ¿ ¸ØÃß±â - ÀÌµ¿»óÅÂ¸é true°í idleÀÌº¥Æ®¿¡¼­ ÀÌµ¿À§Ä¡ °è»ê ÈÄ Àû¿ë
+// ì´ë™ ë©ˆì¶”ê¸° - ì´ë™ìƒíƒœë©´ trueê³  idleì´ë²¤íŠ¸ì—ì„œ ì´ë™ìœ„ì¹˜ ê³„ì‚° í›„ ì ìš©
 void MyKeyboardUp(unsigned char key, int x, int y) {
     switch (key)
     {
@@ -648,14 +625,14 @@ void MyKeyboardUp(unsigned char key, int x, int y) {
 
 }
 
-// Ä«¸Ş¶ó ¾÷µ¥ÀÌÆ® ÇÔ¼ö
+// ì¹´ë©”ë¼ ì—…ë°ì´íŠ¸ í•¨ìˆ˜
 void MyCamera() {
 
-    // Ä«¸Ş¶ó ¾Õ µÚ ¹æÇâ
+    // ì¹´ë©”ë¼ ì• ë’¤ ë°©í–¥
     float lookX = sin(cameraYaw) * cos(cameraPitch);
     float lookZ = -cos(cameraYaw) * cos(cameraPitch);
 
-    // ¾Õ µÚ ÀÌµ¿
+    // ì• ë’¤ ì´ë™
     if (W) {
         cameraX += lookX * moveSpeed;
         cameraZ += lookZ * moveSpeed;
@@ -665,7 +642,7 @@ void MyCamera() {
         cameraZ -= lookZ * moveSpeed;
     }
 
-    // ÁÂ ¿ì ÀÌµ¿ - Ä«¸Ş¶ó ±âÁØ 90µµ ¹æÇâÀ¸·Î ÀÌµ¿
+    // ì¢Œ ìš° ì´ë™ - ì¹´ë©”ë¼ ê¸°ì¤€ 90ë„ ë°©í–¥ìœ¼ë¡œ ì´ë™
     if (A) {
         cameraX -= sin(cameraYaw + PI / 2) * moveSpeed;
         cameraZ += cos(cameraYaw + PI / 2) * moveSpeed;
@@ -675,64 +652,72 @@ void MyCamera() {
         cameraZ -= cos(cameraYaw + PI / 2) * moveSpeed;
     }
 
-    // ¹Ù´Ú ¸ø³ª°¡°Ô
+    // ë°”ë‹¥ ëª»ë‚˜ê°€ê²Œ
     cameraX = std::max(-15.0f, std::min(cameraX, 15.0f));
     cameraZ = std::max(-15.0f, std::min(cameraZ, 15.0f));
 
     glutPostRedisplay();
 }
 
-// ¸¶¿ì½º ¿òÁ÷ÀÓ Äİ¹é ÇÔ¼ö
+// ë§ˆìš°ìŠ¤ ì›€ì§ì„ ì½œë°± í•¨ìˆ˜
 void MyMouseMove(int x, int y) {
 
-    // Ã³À½ ¿òÁ÷ÀÏ ¶§ ¸¶¿ì½º À§Ä¡ ÀúÀå
+    // ì²˜ìŒ ì›€ì§ì¼ ë•Œ ë§ˆìš°ìŠ¤ ìœ„ì¹˜ ì €ì¥
     if (firstMoveMouse) {
         lastX = x;
         lastY = y;
         firstMoveMouse = false;
     }
 
-    // ¸¶¿ì½º ÀÌµ¿ °è»ê
+    // ë§ˆìš°ìŠ¤ ì´ë™ ê³„ì‚°
     float xoffset = x - (float)lastX;
-    float yoffset = (float)lastY - y;  // ¿ª¼øÀ¸·Î °è»ê (y ÁÂÇ¥´Â À§·Î °¥¼ö·Ï ÀÛ¾ÆÁü)
+    float yoffset = (float)lastY - y;  // ì—­ìˆœìœ¼ë¡œ ê³„ì‚° (y ì¢Œí‘œëŠ” ìœ„ë¡œ ê°ˆìˆ˜ë¡ ì‘ì•„ì§)
 
     lastX = x;
     lastY = y;
 
-    // ¸¶¿ì½º ¼Óµµ¿¡ ¸Â°Ô À§Ä¡ ¼³Á¤
+    // ë§ˆìš°ìŠ¤ ì†ë„ì— ë§ê²Œ ìœ„ì¹˜ ì„¤ì •
     xoffset *= mouseSpeed;
     yoffset *= mouseSpeed;
 
-    cameraYaw += xoffset;   // ¼öÆò 
-    cameraPitch += yoffset; // ¼öÁ÷ 
+    cameraYaw += xoffset;   // ìˆ˜í‰ 
+    cameraPitch += yoffset; // ìˆ˜ì§ 
 }
 
 void idle() {
     MyCamera();
 }
 
+// ì½œë°± í•¨ìˆ˜: íƒ€ì´ë¨¸
+void timer(int value) {
+    MyCamera();
+    glutPostRedisplay();
+    glutTimerFunc(16, timer, 0);    // 16msë§ˆë‹¤ timer í˜¸ì¶œ
+}
+
+
 int main(int argc, char** argv) {
 
 
-    // GLUT ÃÊ±âÈ­
+    // GLUT ì´ˆê¸°í™”
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
     glutInitWindowSize(window_width, window_height);
-    glutCreateWindow("ÄÄÇ»ÅÍ ±×·¡ÇÈ½º ±â¸» °úÁ¦ ÇÁ·ÎÁ§Æ® 2) ½Ã°è");
+    glutCreateWindow("ì»´í“¨í„° ê·¸ë˜í”½ìŠ¤ ê¸°ë§ ê³¼ì œ í”„ë¡œì íŠ¸ 2) ì‹œê³„");
 
-    // ¸¶¿ì½º ¼û±â±â
+    // ë§ˆìš°ìŠ¤ ìˆ¨ê¸°ê¸°
     glutSetCursor(GLUT_CURSOR_NONE);
 
 
     /*
-        ½ÇÇà ÆÄÀÏÀÌ ÀÖ´Â °æ·Î·Î ÅØ½ºÃ³ ·Îµå
-        ±âÁ¸¿¡ ¸í·É ÀÎ¼ö¿¡ ³Ö°í ·ÎµåÇÏ¿´À¸³ª, exeÆÄÀÏ·Î ½ÇÇà ½Ã ¸í·É ÀÎ¼ö°¡ ½ÇÇàÀÌ ¾ÈµÊ (argc°ªÀÌ ¾È³ª¿È)
-        ÇöÀç Æú´õ¿¡ ÀÖ´Â bmpÆÄÀÏÀ» ºÒ·¯¿Í¼­ ÅØ½ºÃ³·Î »ç¿ë
+        ì‹¤í–‰ íŒŒì¼ì´ ìˆëŠ” ê²½ë¡œë¡œ í…ìŠ¤ì²˜ ë¡œë“œ
+        ê¸°ì¡´ì— ëª…ë ¹ ì¸ìˆ˜ì— ë„£ê³  ë¡œë“œí•˜ì˜€ìœ¼ë‚˜, exeíŒŒì¼ë¡œ ì‹¤í–‰ ì‹œ ëª…ë ¹ ì¸ìˆ˜ê°€ ì‹¤í–‰ì´ ì•ˆë¨ (argcê°’ì´ ì•ˆë‚˜ì˜´)
+        í˜„ì¬ í´ë”ì— ìˆëŠ” bmpíŒŒì¼ì„ ë¶ˆëŸ¬ì™€ì„œ í…ìŠ¤ì²˜ë¡œ ì‚¬ìš©
     */
     std::string exeDirectory = std::filesystem::current_path().string();
     int loadedTextures = LoadGLTextures(exeDirectory);
 
-    // OpenGL ÃÊ±âÈ­
+    // OpenGL ì´ˆê¸°í™”
     initLight();
 
     glEnable(GL_TEXTURE_2D);
@@ -744,17 +729,17 @@ int main(int argc, char** argv) {
 
 
 
-    // Äİ¹é ÇÔ¼ö µî·Ï
+    // ì½œë°± í•¨ìˆ˜ ë“±ë¡
     glutDisplayFunc(MyDisplay);
     glutReshapeFunc(MyReshape);
-    glutKeyboardFunc(MyKeyboard); // Å°º¸µå ÀÔ·Â ½Ã
-    glutKeyboardUpFunc(MyKeyboardUp); // Å°º¸µå ¶®À» ¶§
-    glutPassiveMotionFunc(MyMouseMove);  // ¸¶¿ì½º
-    glutIdleFunc(idle);
+    glutKeyboardFunc(MyKeyboard); // í‚¤ë³´ë“œ ì…ë ¥ ì‹œ
+    glutKeyboardUpFunc(MyKeyboardUp); // í‚¤ë³´ë“œ ë• ì„ ë•Œ
+    glutPassiveMotionFunc(MyMouseMove);  // ë§ˆìš°ìŠ¤
+    //glutIdleFunc(idle);
+    glutTimerFunc(16, timer, 0); // 16ms ê°„ê²©ìœ¼ë¡œ timer í˜¸ì¶œ
 
     glutMainLoop();
 
 
 
 }
-

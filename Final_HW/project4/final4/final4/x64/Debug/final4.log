@@ -1,0 +1,5 @@
+﻿  final4.cpp
+C:\GitHubDesktop\Computer-Graphics\Final_HW\project4\final4\final4.cpp(139,18): warning C4305: '초기화 중': 'double'에서 'float'(으)로 잘립니다.
+  final4.vcxproj -> C:\GitHubDesktop\Computer-Graphics\Final_HW\project4\final4\x64\Debug\final4.exe
+  'pwsh.exe' is not recognized as an internal or external command,
+  operable program or batch file.
