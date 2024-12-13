@@ -5,11 +5,10 @@
 #include <algorithm>
 #include <cmath>
 #include <iostream>
-
-#include <stdio.h>
-#include <iostream>
+#include <stdio.h>-
 #include <fstream>
 #include <vector>
+#include <cstdlib> // rand(), srand()
 
 #include <filesystem>
 
@@ -18,8 +17,8 @@ typedef struct _AUX_RGBImageRec {
     unsigned char* data;
 } AUX_RGBImageRec;
 
-unsigned int MyTextureObject[5];
-AUX_RGBImageRec* pTextureImage[5];  //텍스쳐 저장 공간을 가리키는 포인터
+unsigned int MyTextureObject[6];
+AUX_RGBImageRec* pTextureImage[6];  //텍스쳐 저장 공간을 가리키는 포인터
 
 AUX_RGBImageRec* LoadBMP(const char* filename) {
     std::ifstream file(filename, std::ios::binary);
@@ -77,8 +76,9 @@ int LoadGLTextures(const std::string& directory) {
     int textureIndex = 0;
 
     // 디렉토리 내 BMP 파일 탐색
+	std::cout << "Loading textures from " << directory << std::endl;
     for (const auto& entry : std::filesystem::directory_iterator(directory)) {
-        if (entry.path().extension() == ".bmp" && textureIndex < 5) {
+        if (entry.path().extension() == ".bmp" && textureIndex < 10) {
             std::string filepath = entry.path().string();
 
             // 텍스처 이미지 로드
@@ -104,20 +104,20 @@ int LoadGLTextures(const std::string& directory) {
 
 //********************************************************************************************************************
 
-// 나무, 바닥, 입간판
+// 나무
 GLuint treeDisplayList;
 
 // 윈도우 크기
-const int window_width = 1920;
-const int window_height = 1080;
+const int window_width = 1280;
+const int window_height = 780;
 
 // 도움말 토글
 bool help = true;
 
 // 카메라 위치, 방향
-float cameraX = 0.0f;
+float cameraX = -22.0f;
 float cameraY = 1.0f;
-float cameraZ = 5.0f;
+float cameraZ = 12.0f;
 float cameraYaw = 0.0f;    // 수평 회전
 float cameraPitch = 0.0f;  // 수직 회전
 
@@ -134,7 +134,7 @@ bool keys[256] = { false };
 bool W = false, A = false, S = false, D = false;
 
 // 이동 관련 변수
-const float moveSpeed = 0.001f;
+const float moveSpeed = 0.01;
 
 // 파이
 const float PI = 3.14;
@@ -150,26 +150,29 @@ GLfloat eveningDiffuse[] = { 1.0f, 0.8f, 0.5f, 1.0f };
 
 // 나무 위치 
 const int numTrees = 100; // 나무 개수
-const float treePositions[numTrees][2] = {
-    { -14.0f,  12.5f}, { 10.5f, -14.2f}, {  3.0f, -13.0f}, { -8.0f,  14.5f}, {  9.0f,   7.0f},
-    { -15.0f,   4.0f}, { 12.0f,   6.5f}, { -13.5f, -5.0f}, {  7.5f, -12.0f}, { -2.0f,  10.0f},
-    { 11.0f,   3.5f}, { -6.0f,  -8.0f}, {  5.5f,  11.5f}, { -4.0f, -14.0f}, {  3.5f,  15.0f},
-    { -11.0f,   0.5f}, { 14.5f,  -9.0f}, { -5.5f,   7.0f}, { 12.5f, -12.0f}, { -10.0f,  14.5f},
-    {  8.5f,  -6.0f}, { -3.5f,   8.0f}, {  7.0f,   9.5f}, { -14.5f, -10.0f}, { 13.0f, -11.0f},
-    { -12.0f,   4.5f}, {  4.0f, -15.0f}, { -7.5f,  13.5f}, { 11.5f,   2.0f}, {  6.5f, -14.0f},
-    {  3.0f,  12.0f}, { -10.5f,  14.0f}, {  2.0f,   5.5f}, {  9.5f, -13.5f}, { -8.5f,  15.0f},
-    { 14.0f,   6.0f}, { 12.0f,  -2.5f}, {  5.5f,  13.0f}, { -15.0f,  -3.0f}, { 10.5f,  -9.0f},
-    { -13.0f,  -7.5f}, {  6.0f,  10.5f}, {  8.0f,  -5.5f}, { -7.0f,  11.0f}, { 13.5f,   0.0f},
-    {  1.5f,   6.5f}, {  4.5f, -10.0f}, { -9.5f,   8.0f}, { -14.5f,   3.0f}, {  7.5f, -11.5f},
-    { -5.0f,  14.5f}, { 15.0f,  -6.5f}, { -3.0f,   5.0f}, {  9.0f,   8.5f}, { -12.5f, -13.0f},
-    { 11.0f,  -4.5f}, {  8.5f,  14.0f}, { -4.5f, -12.0f}, {  3.5f,  15.0f}, { -10.0f,  13.0f},
-    {  2.5f,   6.0f}, { 12.0f, -10.5f}, { -6.5f,   8.0f}, {  5.0f,  -3.5f}, { 14.5f,  -2.0f},
-    {  0.0f,  10.0f}, { -15.0f, -14.0f}, {  7.0f,  12.5f}, { -13.0f,   9.0f}, { 11.5f,   4.5f},
-    {  6.5f, -12.0f}, { -8.5f,  10.0f}, {  3.0f,  -6.5f}, { -14.0f,   0.5f}, { 15.0f,   9.5f},
-    { -5.0f,   7.5f}, {  9.0f, -13.5f}, { -4.0f,  11.0f}, { 12.5f,  -8.0f}, {  8.0f,   3.5f},
-    { -9.5f,   6.0f}, { 14.5f, -10.0f}, {  4.0f,  15.0f}, { -6.0f,  -9.5f}, { 13.0f,   2.0f},
-    {  7.5f,  -4.0f}, { -11.5f,  13.5f}, {  6.0f,   8.0f}, { -14.5f,   4.5f}, { 10.5f,  -7.0f}
-};
+GLfloat treePositions[numTrees][2]; // 나무 위치
+
+// 나무 포지션 랜덤 함수
+void CreateTreePositions(int numTrees, GLfloat treePositions[][2]) {
+    for (int i = 0; i < numTrees; ++i) {
+        while (true) {
+            // 랜덤 위치  - 바닥 크기가 30, 30이라 -30~30 까지
+            float x = static_cast<float>(rand() % 61 - 30); // -30 ~ 30
+            float z = static_cast<float>(rand() % 61 - 30); // -30 ~ 30
+
+            // 길에 나무가 겹치는지 확인
+            bool inRoad = !(x >= -13.5f && x <= 1.5f && z >= 1.5f && z <= 4.5f) && !(x >= -25.0f && x <= -10.0f && z >= 6.0f && z <= 10.0f);
+ 
+
+            if (inRoad) {
+                // 길 범위가 아닌 경우 위치 설정
+                treePositions[i][0] = x;
+                treePositions[i][1] = z;
+                break;
+            }
+        }
+    }
+}
 
 void CreatSignboard() {
     // 입간판 재질 설정 
@@ -225,16 +228,16 @@ void CreatSignboard() {
     glBegin(GL_QUADS);
 
     // 앞면 (텍스쳐)
-    glTexCoord2f(0.0f, 1.0f); glVertex3f(-0.6f, 0.5f, 0.1f);   
-    glTexCoord2f(1.0f, 1.0f); glVertex3f(0.6f, 0.5f, 0.1f);  
-    glTexCoord2f(1.0f, 0.0f); glVertex3f(0.6f, 1.0f, 0.1f);  
-    glTexCoord2f(0.0f, 0.0f); glVertex3f(-0.6f, 1.0f, 0.1f);  
+    glTexCoord2f(0.0f, 1.0f); glVertex3f(-0.6f, 0.5f, 0.1f);
+    glTexCoord2f(1.0f, 1.0f); glVertex3f(0.6f, 0.5f, 0.1f);
+    glTexCoord2f(1.0f, 0.0f); glVertex3f(0.6f, 1.0f, 0.1f);
+    glTexCoord2f(0.0f, 0.0f); glVertex3f(-0.6f, 1.0f, 0.1f);
 
     // 뒷면 (텍스쳐)
-    glTexCoord2f(1.0f, 1.0f); glVertex3f(-0.6f, 0.5f, -0.1f);  
-    glTexCoord2f(0.0f, 1.0f); glVertex3f(0.6f, 0.5f, -0.1f);  
-    glTexCoord2f(0.0f, 0.0f); glVertex3f(0.6f, 1.0f, -0.1f);  
-    glTexCoord2f(1.0f, 0.0f); glVertex3f(-0.6f, 1.0f, -0.1f);  
+    glTexCoord2f(1.0f, 1.0f); glVertex3f(-0.6f, 0.5f, -0.1f);
+    glTexCoord2f(0.0f, 1.0f); glVertex3f(0.6f, 0.5f, -0.1f);
+    glTexCoord2f(0.0f, 0.0f); glVertex3f(0.6f, 1.0f, -0.1f);
+    glTexCoord2f(1.0f, 0.0f); glVertex3f(-0.6f, 1.0f, -0.1f);
 
 
     // 왼쪽 면
@@ -357,9 +360,8 @@ void CreateText(float x, float y, float z, void* font, const std::string& text) 
     }
 }
 
-
 void Skybox() {
-    int TEX_SIZE = 3;
+    GLfloat TEX_SIZE = 3;
 
     glEnable(GL_TEXTURE_2D);
 
@@ -429,69 +431,6 @@ void Skybox() {
     glPopMatrix();
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);  // 텍스처 환경 초기화
     glDisable(GL_TEXTURE_2D);
-}
-
-
-// 디스플레이 콜백 함수
-void MyDisplay() {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glLoadIdentity();
-
-    Skybox();
-
-    // 카메라 방향 벡터 계산
-    float lookX = sin(cameraYaw) * cos(cameraPitch);
-    float lookY = sin(cameraPitch);
-    float lookZ = -cos(cameraYaw) * cos(cameraPitch);
-
-    gluLookAt(
-        cameraX, cameraY, cameraZ,                          // 카메라 위치
-        cameraX + lookX, cameraY + lookY, cameraZ + lookZ,  // 바라보는 지점
-        0.0, 1.0, 0.0                                       // 위쪽 방향
-    );
-
-    // 입간판 렌더링
-    glPushMatrix();
-    glTranslatef(3, 0, 3); // X, Z 위치로 이동
-    CreatSignboard();
-    glPopMatrix();
-
-    // 바닥 렌더링
-    GLfloat defaultMaterial[] = { 1.0f, 1.0f, 1.0f, 1.0f };  // 기본 Ambient 값
-    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, defaultMaterial);
-
-    glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, MyTextureObject[1]);
-
-    glBegin(GL_QUADS);
-        glNormal3f(0, 1, 0);
-        glTexCoord2f(0.0f, 1.0f);  glVertex3f(-15, 0, -15);
-        glTexCoord2f(1.0f, 1.0f);  glVertex3f(15, 0, -15);
-        glTexCoord2f(1.0f, 0.0f);  glVertex3f(15, 0, 15);
-        glTexCoord2f(0.0f, 0.0f);  glVertex3f(-15, 0, 15);
-    glEnd();
-    glDisable(GL_TEXTURE_2D);
-
-    // 나무 렌더링
-    for (int i = 0; i < numTrees; ++i) {
-        glPushMatrix();
-        glTranslatef(treePositions[i][0], 0, treePositions[i][1]); // X, Z 위치로 이동
-        glCallList(treeDisplayList); // 나무 렌더링
-        glPopMatrix();
-    }
-
-    // 도움말 출력
-    if (help) {
-        GLfloat signboardMaterial[] = { 1.0f, 0.0f, 0.07f, 1.0f };
-        glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, signboardMaterial);
-        CreateText(0.0f, 1.5f, 1.5f, GLUT_BITMAP_HELVETICA_18, "Park Scenes");
-        CreateText(0.0f, 1.4f, 1.5f, GLUT_BITMAP_HELVETICA_18, "Move with W, A, S, D");
-        CreateText(0.0f, 1.3f, 1.5f, GLUT_BITMAP_HELVETICA_18, "Rotate with the mouse");
-        CreateText(0.0f, 1.2f, 1.5f, GLUT_BITMAP_HELVETICA_18, "Press L to switch between day and night");
-        CreateText(0.0f, 1.1f, 1.5f, GLUT_BITMAP_HELVETICA_18, "Press H to toggle the help menu");
-    }
-
-    glutSwapBuffers();
 }
 
 // 윈도우 크기 변경 콜백 함수
@@ -601,8 +540,8 @@ void MyCamera() {
     }
 
     // 바닥 못나가게
-    cameraX = std::max(-10.0f, std::min(cameraX, 10.0f));
-    cameraZ = std::max(-10.0f, std::min(cameraZ, 10.0f));
+    //cameraX = std::max(-10.0f, std::min(cameraX, 10.0f));
+    //cameraZ = std::max(-10.0f, std::min(cameraZ, 10.0f));
 
     glutPostRedisplay();
 }
@@ -636,12 +575,163 @@ void idle() {
     MyCamera();
 }
 
+void CreateStreetLamp() {
+
+    // 텍스처 활성화
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, MyTextureObject[3]);
+    GLUquadric* quad = gluNewQuadric();
+    gluQuadricTexture(quad, GL_TRUE);  // 원기둥 텍스처 매핑
+
+    glPushMatrix();
+    glTranslatef(0, 0, 0); // 원점에서 시작
+    glRotatef(-90, 1, 0, 0); // X축 기준 90도 회전
+    gluCylinder(quad, 0.1, 0.1, 5.0, 32, 32); // 밑면 반지름 0.5, 윗면 반지름 0.5, 높이 5
+    glPopMatrix();
+    gluDeleteQuadric(quad);
+
+    glPushMatrix();
+    glTranslatef(1, 5, 0); // 기둥 위쪽 끝으로 이동
+    glRotatef(90, 1, 0, 0); // X축 기준 90도 회전
+
+    glBegin(GL_QUADS);
+    glNormal3f(0, 0, 1);
+    glVertex3f(-1, -0.1, 0); // 직사각형 한 면의 네 점 정의
+    glVertex3f(1, -0.1, 0);
+    glVertex3f(1, 0.1, 0);
+    glVertex3f(-1, 0.1, 0);
+    glEnd();
+
+    glPopMatrix();
+}
+
+// 디스플레이 콜백 함수
+void MyDisplay() {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glLoadIdentity();
+
+    //Skybox(); 낮, 저녁 구분을 위해 하늘 배경은 안씀
+
+    // 카메라 방향 벡터 계산
+    float lookX = sin(cameraYaw) * cos(cameraPitch);
+    float lookY = sin(cameraPitch);
+    float lookZ = -cos(cameraYaw) * cos(cameraPitch);
+
+    gluLookAt(
+        cameraX, cameraY, cameraZ,                          // 카메라 위치
+        cameraX + lookX, cameraY + lookY, cameraZ + lookZ,  // 바라보는 지점
+        0.0, 1.0, 0.0                                       // 위쪽 방향
+    );
+
+    // 입간판 렌더링
+    glPushMatrix();
+    glTranslatef(3, 0, 3); // X, Z 위치로 이동
+    glRotatef(-40, 0, 1, 0);
+    CreatSignboard();
+    glPopMatrix();
+
+    // 바닥 렌더링
+    GLfloat defaultMaterial[] = { 1.0f, 1.0f, 1.0f, 1.0f };  // 기본 Ambient 값
+    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, defaultMaterial);
+
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, MyTextureObject[0]);
+
+    glBegin(GL_QUADS);
+    glNormal3f(0, 1, 0);
+    glTexCoord2f(0.0f, 1.0f);  glVertex3f(-30, 0, -30);
+    glTexCoord2f(1.0f, 1.0f);  glVertex3f(30, 0, -30);
+    glTexCoord2f(1.0f, 0.0f);  glVertex3f(30, 0, 30);
+    glTexCoord2f(0.0f, 0.0f);  glVertex3f(-30, 0, 30);
+    glEnd();
+    glDisable(GL_TEXTURE_2D);
+
+    // 길 렌더링
+    //GLfloat aaaaa[] = { 1.0f, 0.0f, 0.0f, 1.0f };  
+    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, defaultMaterial);
+
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, MyTextureObject[1]);
+
+    glPushMatrix();
+    glTranslatef(-6, 0, 3);
+    glBegin(GL_QUADS);
+    glNormal3f(0, 1, 0);
+    glTexCoord2f(0.0f, 1.0f);  glVertex3f(-7.5, 0.01, -1.5); // 좌측 하단
+    glTexCoord2f(1.0f, 1.0f);  glVertex3f(7.5, 0.01, -1.5);  // 우측 하단
+    glTexCoord2f(1.0f, 0.0f);  glVertex3f(7.5, 0.01, 1.5);   // 우측 상단
+    glTexCoord2f(0.0f, 0.0f);  glVertex3f(-7.5, 0.01, 1.5);  // 좌측 상단
+    glEnd();
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(-17.8, 0, 7.9); 
+    glRotatef(45, 0, 1, 0);
+    glBegin(GL_QUADS);
+    glNormal3f(0, 1, 0);
+    glTexCoord2f(0.0f, 1.0f);  glVertex3f(-7.5, 0.011, -1.5); // 좌측 하단
+    glTexCoord2f(1.0f, 1.0f);  glVertex3f(7.5, 0.011, -1.5);  // 우측 하단
+    glTexCoord2f(1.0f, 0.0f);  glVertex3f(7.5, 0.011, 1.5);   // 우측 상단
+    glTexCoord2f(0.0f, 0.0f);  glVertex3f(-7.5, 0.011, 1.5);  // 좌측 상단
+    glEnd();
+    glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
+
+    // 가로등
+    for (int i = 0; i < 5; ++i) {
+        glPushMatrix();
+        glTranslatef(-i*3, 0, 0); // X, Z 위치로 이동
+        glRotatef(-95, 0, 1, 0);
+        CreateStreetLamp();
+        glPopMatrix();
+    }
+
+    for (int i = 0; i < 5; ++i) {
+        glPushMatrix();
+        glTranslatef(-14.8, 0, 1.9); 
+        glRotatef(45, 0, 1, 0);
+        glPushMatrix();
+        glTranslatef(-i * 3, 0, 0); // X, Z 위치로 이동
+        glRotatef(-95, 0, 1, 0);
+        CreateStreetLamp();
+        glPopMatrix();
+        glPopMatrix();
+    }
+
+
+    // 나무
+    for (int i = 0; i < numTrees; ++i) {
+        glPushMatrix();
+        glTranslatef(treePositions[i][0], 0, treePositions[i][1]); // X, Z 위치로 이동
+        glScaled(3, 3, 3); // 크기 조절
+        glCallList(treeDisplayList); // 나무 렌더링
+        glPopMatrix();
+    }
+
+    // 도움말 출력
+    if (help) {
+        GLfloat signboardMaterial[] = { 1.0f, 0.0f, 0.07f, 1.0f };
+        glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, signboardMaterial);
+        glPushMatrix();
+        glTranslatef(-17.5, 0, 8);
+        CreateText(0.0f, 1.5f, 1.5f, GLUT_BITMAP_HELVETICA_18, "Park Scenes");
+        CreateText(0.0f, 1.4f, 1.5f, GLUT_BITMAP_HELVETICA_18, "Move with W, A, S, D");
+        CreateText(0.0f, 1.3f, 1.5f, GLUT_BITMAP_HELVETICA_18, "Rotate with the mouse");
+        CreateText(0.0f, 1.2f, 1.5f, GLUT_BITMAP_HELVETICA_18, "Press L to switch between day and night");
+        CreateText(0.0f, 1.1f, 1.5f, GLUT_BITMAP_HELVETICA_18, "Press H to toggle the help menu");
+        glPopMatrix();
+    }
+
+    glutSwapBuffers();
+}
+
 int main(int argc, char** argv) {
 
     // GLUT 초기화
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
     glutInitWindowSize(window_width, window_height);
+	glutInitWindowPosition(10, 10);
     glutCreateWindow("컴퓨터 그래픽스 기말 과제 프로젝트 1) 공원 걷기");
 
     // 마우스 숨기기
@@ -654,7 +744,7 @@ int main(int argc, char** argv) {
     */
     std::string exeDirectory = std::filesystem::current_path().string();
     int loadedTextures = LoadGLTextures(exeDirectory);
-        
+
     glEnable(GL_TEXTURE_2D);
     glShadeModel(GL_SMOOTH);
     glClearDepth(1.0);
@@ -673,6 +763,8 @@ int main(int argc, char** argv) {
     glutKeyboardUpFunc(MyKeyboardUp); // 키보드 땠을 때
     glutPassiveMotionFunc(MyMouseMove);  // 마우스
     glutIdleFunc(idle);
+
+    CreateTreePositions(numTrees, treePositions);
 
     glutMainLoop();
 

@@ -1,9 +1,0 @@
-﻿  final2.cpp
-C:\Users\kmn27\Documents\GitHub\ComputerGraphics\Final_HW\project2\final2\final2.cpp(138,22): warning C4305: '초기화 중': 'double'에서 'float'(으)로 잘립니다.
-C:\Users\kmn27\Documents\GitHub\ComputerGraphics\Final_HW\project2\final2\final2.cpp(436,36): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
-  코드를 생성하고 있습니다.
-  74 of 228 functions (32.5%) were compiled, the rest were copied from previous compilation.
-    19 functions were new in current compilation
-    31 functions had inline decision re-evaluated but remain unchanged
-  코드를 생성했습니다.
-  final2.vcxproj -> C:\Users\kmn27\Documents\GitHub\ComputerGraphics\Final_HW\project2\final2\x64\Release\final2.exe
