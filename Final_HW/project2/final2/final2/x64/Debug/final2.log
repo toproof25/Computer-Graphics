@@ -1,6 +1,6 @@
 ﻿  final2.cpp
 C:\GitHubDesktop\Computer-Graphics\Final_HW\project2\final2\final2.cpp(140,18): warning C4305: '초기화 중': 'double'에서 'float'(으)로 잘립니다.
-C:\GitHubDesktop\Computer-Graphics\Final_HW\project2\final2\final2.cpp(395,27): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
+C:\GitHubDesktop\Computer-Graphics\Final_HW\project2\final2\final2.cpp(393,27): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
   final2.vcxproj -> C:\GitHubDesktop\Computer-Graphics\Final_HW\project2\final2\x64\Debug\final2.exe
   'pwsh.exe' is not recognized as an internal or external command,
   operable program or batch file.

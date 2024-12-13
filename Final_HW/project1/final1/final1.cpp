@@ -17,8 +17,8 @@ typedef struct _AUX_RGBImageRec {
     unsigned char* data;
 } AUX_RGBImageRec;
 
-unsigned int MyTextureObject[6];
-AUX_RGBImageRec* pTextureImage[6];  //텍스쳐 저장 공간을 가리키는 포인터
+unsigned int MyTextureObject[7];
+AUX_RGBImageRec* pTextureImage[7];  //텍스쳐 저장 공간을 가리키는 포인터
 
 AUX_RGBImageRec* LoadBMP(const char* filename) {
     std::ifstream file(filename, std::ios::binary);
@@ -114,27 +114,33 @@ const int window_height = 780;
 // 도움말 토글
 bool help = true;
 
-// 카메라 위치, 방향
+// 카메라 위치
 float cameraX = -22.0f;
 float cameraY = 1.0f;
 float cameraZ = 12.0f;
-float cameraYaw = 0.0f;    // 수평 회전
-float cameraPitch = 0.0f;  // 수직 회전
+
+// 이동 속도
+const float moveSpeed = 0.1;
+
+// 방향
+float cameraYaw = 0.0f;   
+float cameraPitch = 0.0f; 
 
 // 마우스 관련 변수
 int lastX = window_width / 2;  // 윈도우 중앙을 0으로
 int lastY = window_height / 2;
 
 bool firstMoveMouse = true; // 처음 움직일 때 lastX, lastY을 저장하기 위해
-
 const float mouseSpeed = 0.005f; //   마우스 속도
 
 // 키 상태 - 키에 모든 배열을 false로 초기화 -> W, A, S, D 키에 대해서 true로 설정
 bool keys[256] = { false };
 bool W = false, A = false, S = false, D = false;
 
-// 이동 관련 변수
-const float moveSpeed = 0.1;
+
+GLfloat squirrelX = 0.0f, squirrelZ = 0.0f; // 다람쥐 위치
+float targetX = 0.0f, targetZ = 0.0f; // 목표 위치
+float squirrelSpeed = 0.1f; // 이동 속도
 
 // 파이
 const float PI = 3.14;
@@ -151,6 +157,86 @@ GLfloat eveningDiffuse[] = { 1.0f, 0.8f, 0.5f, 1.0f };
 // 나무 위치 
 const int numTrees = 100; // 나무 개수
 GLfloat treePositions[numTrees][2]; // 나무 위치
+
+// 다람쥐 랜덤 위치
+void CreateRandomPosition() {
+    targetX = (rand() % 21 - 10); // -10 ~ 10 범위
+    targetZ = (rand() % 21 - 10); // -10 ~ 10 범위
+}
+
+// 다람쥐 이동
+void MoveSquirrel() {
+    float x = targetX - squirrelX;
+    float z = targetZ - squirrelZ;
+
+    // 목표 위치 근처라면 다시 위치 얻기
+    if (fabs(x) < 0.5f && fabs(z) < 0.5f) {
+        CreateRandomPosition(); 
+    }
+
+    // 이동 방향 계산 (속도 적용)
+    if (fabs(x) > 0.1f) {
+        squirrelX += (x > 0 ? squirrelSpeed : -squirrelSpeed); // x 방향으로 이동
+    }
+    if (fabs(z) > 0.1f) {
+        squirrelZ += (z > 0 ? squirrelSpeed : -squirrelSpeed); // z 방향으로 이동
+    }
+}
+
+// 다람쥐 그리기
+void CreateSquirrel() {
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, MyTextureObject[4]);
+
+    glPushMatrix();
+    glTranslatef(squirrelX, 0.15f, squirrelZ); // 큐브의 위치를 랜덤으로 이동
+    float Size = 0.3f / 2.0f;  // 큐브 크기의 절반
+
+    // 큐브의 6면을 그리기 위한 텍스처 매핑
+    glBegin(GL_QUADS);
+
+    // 앞면
+    glTexCoord2f(0.0f, 1.0f); glVertex3f(-Size, -Size, Size); // 좌하단
+    glTexCoord2f(1.0f, 1.0f); glVertex3f(Size, -Size, Size); // 우하단
+    glTexCoord2f(1.0f, 0.0f); glVertex3f(Size, Size, Size); // 우상단
+    glTexCoord2f(0.0f, 0.0f); glVertex3f(-Size, Size, Size); // 좌상단
+
+    // 뒷면
+    glTexCoord2f(0.0f, 1.0f); glVertex3f(-Size, -Size, -Size); // 좌하단
+    glTexCoord2f(1.0f, 1.0f); glVertex3f(Size, -Size, -Size); // 우하단
+    glTexCoord2f(1.0f, 0.0f); glVertex3f(Size, Size, -Size); // 우상단
+    glTexCoord2f(0.0f, 0.0f); glVertex3f(-Size, Size, -Size); // 좌상단
+
+    // 좌측면
+    glTexCoord2f(0.0f, 0.0f); glVertex3f(-Size, -Size, -Size); // 좌하단
+    glTexCoord2f(1.0f, 0.0f); glVertex3f(-Size, -Size, Size); // 우하단
+    glTexCoord2f(1.0f, 1.0f); glVertex3f(-Size, Size, Size); // 우상단
+    glTexCoord2f(0.0f, 1.0f); glVertex3f(-Size, Size, -Size); // 좌상단
+
+    // 우측면
+    glTexCoord2f(0.0f, 0.0f); glVertex3f(Size, -Size, -Size); // 좌하단
+    glTexCoord2f(1.0f, 0.0f); glVertex3f(Size, -Size, Size); // 우하단
+    glTexCoord2f(1.0f, 1.0f); glVertex3f(Size, Size, Size); // 우상단
+    glTexCoord2f(0.0f, 1.0f); glVertex3f(Size, Size, -Size); // 좌상단
+
+    // 상면
+    glTexCoord2f(0.0f, 0.0f); glVertex3f(-Size, Size, -Size); // 좌하단
+    glTexCoord2f(1.0f, 0.0f); glVertex3f(Size, Size, -Size); // 우하단
+    glTexCoord2f(1.0f, 1.0f); glVertex3f(Size, Size, Size); // 우상단
+    glTexCoord2f(0.0f, 1.0f); glVertex3f(-Size, Size, Size); // 좌상단
+
+    // 하면
+    glTexCoord2f(0.0f, 0.0f); glVertex3f(-Size, -Size, -Size); // 좌하단
+    glTexCoord2f(1.0f, 0.0f); glVertex3f(Size, -Size, -Size); // 우하단
+    glTexCoord2f(1.0f, 1.0f); glVertex3f(Size, -Size, Size); // 우상단
+    glTexCoord2f(0.0f, 1.0f); glVertex3f(-Size, -Size, Size); // 좌상단
+
+    glEnd();
+    glDisable(GL_TEXTURE_2D); // 텍스처 비활성화
+    glPopMatrix();
+    glDisable(GL_TEXTURE_2D);
+}
+
 
 // 나무 포지션 랜덤 함수
 void CreateTreePositions(int numTrees, GLfloat treePositions[][2]) {
@@ -283,7 +369,7 @@ void initTree() {
 
     // 텍스처 활성화
     glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, MyTextureObject[4]);
+    glBindTexture(GL_TEXTURE_2D, MyTextureObject[5]);
 
     // 줄기 (원기둥)
     glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, brownMaterial);
@@ -330,7 +416,6 @@ void initTree() {
 
 // OpenGL 초기화 함수
 void initLight() {
-    // 렌더링 설정
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
@@ -558,7 +643,7 @@ void MyMouseMove(int x, int y) {
 
     // 마우스 이동 계산
     float xoffset = x - (float)lastX;
-    float yoffset = (float)lastY - y;  // 역순으로 계산 (y 좌표는 위로 갈수록 작아짐)
+    float yoffset = (float)lastY - y;  // 역순
 
     lastX = x;
     lastY = y;
@@ -571,13 +656,11 @@ void MyMouseMove(int x, int y) {
     cameraPitch += yoffset; // 수직 
 }
 
-void idle() {
-    MyCamera();
-}
 
-// 콜백 함수: 타이머
+// 타이머
 void timer(int value) {
-    MyCamera();           
+    MyCamera(); 
+    MoveSquirrel();
     glutPostRedisplay();
     glutTimerFunc(16, timer, 0);    // 16ms마다 timer 호출
 }
@@ -614,22 +697,20 @@ void CreateStreetLamp() {
     glPopMatrix();
 }
 
-
-// 디스플레이 콜백 함수
 void MyDisplay() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 
     //Skybox(); 낮, 저녁 구분을 위해 하늘 배경은 안씀
 
-    // 카메라 방향 벡터 계산
-    float lookX = sin(cameraYaw) * cos(cameraPitch);
-    float lookY = sin(cameraPitch);
-    float lookZ = -cos(cameraYaw) * cos(cameraPitch);
+    // 카메라 방향
+    float directionX = sin(cameraYaw) * cos(cameraPitch);
+    float directionY = sin(cameraPitch);
+    float directionZ = -cos(cameraYaw) * cos(cameraPitch);
 
     gluLookAt(
         cameraX, cameraY, cameraZ,                          // 카메라 위치
-        cameraX + lookX, cameraY + lookY, cameraZ + lookZ,  // 바라보는 지점
+        cameraX + directionX, cameraY + directionY, cameraZ + directionZ,  // 바라보는 지점
         0.0, 1.0, 0.0                                       // 위쪽 방향
     );
 
@@ -657,7 +738,6 @@ void MyDisplay() {
     glDisable(GL_TEXTURE_2D);
 
     // 길 렌더링
-    //GLfloat aaaaa[] = { 1.0f, 0.0f, 0.0f, 1.0f };  
     glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, defaultMaterial);
 
     glEnable(GL_TEXTURE_2D);
@@ -708,6 +788,9 @@ void MyDisplay() {
         glPopMatrix();
     }
 
+    // 다람쥐 그리기
+    CreateSquirrel();
+
 
     // 나무
     for (int i = 0; i < numTrees; ++i) {
@@ -738,6 +821,7 @@ void MyDisplay() {
 int main(int argc, char** argv) {
 
     // GLUT 초기화
+    srand(static_cast<unsigned int>(time(0))); 
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
     glutInitWindowSize(window_width, window_height);
@@ -752,8 +836,8 @@ int main(int argc, char** argv) {
         기존에 명령 인수에 넣고 로드하였으나, exe파일로 실행 시 명령 인수가 실행이 안됨 (argc값이 안나옴)
         현재 폴더에 있는 bmp파일을 불러와서 텍스처로 사용
     */
-    std::string exeDirectory = std::filesystem::current_path().string();
-    int loadedTextures = LoadGLTextures(exeDirectory);
+    std::string directory = std::filesystem::current_path().string();
+    int loadTexture = LoadGLTextures(directory);
 
     glEnable(GL_TEXTURE_2D);
     glShadeModel(GL_SMOOTH);
@@ -773,7 +857,7 @@ int main(int argc, char** argv) {
     glutKeyboardUpFunc(MyKeyboardUp); // 키보드 땠을 때
     glutPassiveMotionFunc(MyMouseMove);  // 마우스
     //glutIdleFunc(idle);
-    glutTimerFunc(16, timer, 0); // 16ms 간격으로 timer 호출
+    glutTimerFunc(16, timer, 0); // 16ms 간격
 
     CreateTreePositions(numTrees, treePositions);
 

@@ -1,25 +1,27 @@
 ﻿  final1.cpp
 C:\GitHubDesktop\Computer-Graphics\Final_HW\project1\final1\final1.cpp(8,10): warning C4067: 전처리기 지시문 다음에 예기치 않은 토큰이 있습니다. 줄 바꿈 문자가 필요합니다.
-C:\GitHubDesktop\Computer-Graphics\Final_HW\project1\final1\final1.cpp(137,25): warning C4305: '초기화 중': 'double'에서 'float'(으)로 잘립니다.
-C:\GitHubDesktop\Computer-Graphics\Final_HW\project1\final1\final1.cpp(140,18): warning C4305: '초기화 중': 'double'에서 'float'(으)로 잘립니다.
-C:\GitHubDesktop\Computer-Graphics\Final_HW\project1\final1\final1.cpp(608,20): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
-C:\GitHubDesktop\Computer-Graphics\Final_HW\project1\final1\final1.cpp(609,19): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
-C:\GitHubDesktop\Computer-Graphics\Final_HW\project1\final1\final1.cpp(610,19): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
-C:\GitHubDesktop\Computer-Graphics\Final_HW\project1\final1\final1.cpp(611,20): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
-C:\GitHubDesktop\Computer-Graphics\Final_HW\project1\final1\final1.cpp(670,49): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
-C:\GitHubDesktop\Computer-Graphics\Final_HW\project1\final1\final1.cpp(671,48): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
-C:\GitHubDesktop\Computer-Graphics\Final_HW\project1\final1\final1.cpp(672,48): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
-C:\GitHubDesktop\Computer-Graphics\Final_HW\project1\final1\final1.cpp(673,49): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
-C:\GitHubDesktop\Computer-Graphics\Final_HW\project1\final1\final1.cpp(678,28): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
-C:\GitHubDesktop\Computer-Graphics\Final_HW\project1\final1\final1.cpp(678,18): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
-C:\GitHubDesktop\Computer-Graphics\Final_HW\project1\final1\final1.cpp(682,49): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
-C:\GitHubDesktop\Computer-Graphics\Final_HW\project1\final1\final1.cpp(683,48): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
-C:\GitHubDesktop\Computer-Graphics\Final_HW\project1\final1\final1.cpp(684,48): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
-C:\GitHubDesktop\Computer-Graphics\Final_HW\project1\final1\final1.cpp(685,49): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
-C:\GitHubDesktop\Computer-Graphics\Final_HW\project1\final1\final1.cpp(693,24): warning C4244: '인수': 'int'에서 'GLfloat'(으)로 변환하면서 데이터가 손실될 수 있습니다.
-C:\GitHubDesktop\Computer-Graphics\Final_HW\project1\final1\final1.cpp(701,32): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
-C:\GitHubDesktop\Computer-Graphics\Final_HW\project1\final1\final1.cpp(701,22): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
-C:\GitHubDesktop\Computer-Graphics\Final_HW\project1\final1\final1.cpp(704,25): warning C4244: '인수': 'int'에서 'GLfloat'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\GitHubDesktop\Computer-Graphics\Final_HW\project1\final1\final1.cpp(123,25): warning C4305: '초기화 중': 'double'에서 'float'(으)로 잘립니다.
+C:\GitHubDesktop\Computer-Graphics\Final_HW\project1\final1\final1.cpp(146,18): warning C4305: '초기화 중': 'double'에서 'float'(으)로 잘립니다.
+C:\GitHubDesktop\Computer-Graphics\Final_HW\project1\final1\final1.cpp(163,28): warning C4244: '=': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\GitHubDesktop\Computer-Graphics\Final_HW\project1\final1\final1.cpp(164,28): warning C4244: '=': 'int'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\GitHubDesktop\Computer-Graphics\Final_HW\project1\final1\final1.cpp(691,20): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
+C:\GitHubDesktop\Computer-Graphics\Final_HW\project1\final1\final1.cpp(692,19): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
+C:\GitHubDesktop\Computer-Graphics\Final_HW\project1\final1\final1.cpp(693,19): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
+C:\GitHubDesktop\Computer-Graphics\Final_HW\project1\final1\final1.cpp(694,20): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
+C:\GitHubDesktop\Computer-Graphics\Final_HW\project1\final1\final1.cpp(750,49): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
+C:\GitHubDesktop\Computer-Graphics\Final_HW\project1\final1\final1.cpp(751,48): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
+C:\GitHubDesktop\Computer-Graphics\Final_HW\project1\final1\final1.cpp(752,48): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
+C:\GitHubDesktop\Computer-Graphics\Final_HW\project1\final1\final1.cpp(753,49): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
+C:\GitHubDesktop\Computer-Graphics\Final_HW\project1\final1\final1.cpp(758,28): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
+C:\GitHubDesktop\Computer-Graphics\Final_HW\project1\final1\final1.cpp(758,18): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
+C:\GitHubDesktop\Computer-Graphics\Final_HW\project1\final1\final1.cpp(762,49): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
+C:\GitHubDesktop\Computer-Graphics\Final_HW\project1\final1\final1.cpp(763,48): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
+C:\GitHubDesktop\Computer-Graphics\Final_HW\project1\final1\final1.cpp(764,48): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
+C:\GitHubDesktop\Computer-Graphics\Final_HW\project1\final1\final1.cpp(765,49): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
+C:\GitHubDesktop\Computer-Graphics\Final_HW\project1\final1\final1.cpp(773,24): warning C4244: '인수': 'int'에서 'GLfloat'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+C:\GitHubDesktop\Computer-Graphics\Final_HW\project1\final1\final1.cpp(781,32): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
+C:\GitHubDesktop\Computer-Graphics\Final_HW\project1\final1\final1.cpp(781,22): warning C4305: '인수': 'double'에서 'GLfloat'(으)로 잘립니다.
+C:\GitHubDesktop\Computer-Graphics\Final_HW\project1\final1\final1.cpp(784,25): warning C4244: '인수': 'int'에서 'GLfloat'(으)로 변환하면서 데이터가 손실될 수 있습니다.
   final1.vcxproj -> C:\GitHubDesktop\Computer-Graphics\Final_HW\project1\final1\x64\Debug\final1.exe
   'pwsh.exe' is not recognized as an internal or external command,
   operable program or batch file.
